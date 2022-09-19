@@ -5,7 +5,8 @@ import 'package:get/get.dart';
 
 class Header extends StatelessWidget {
   String title;
-  Header({Key? key,required this.title}) : super(key: key);
+
+  Header({Key? key, required this.title}) : super(key: key);
 
   LayoutController lc = Get.put(LayoutController());
 
@@ -20,7 +21,10 @@ class Header extends StatelessWidget {
               lc.openDrawer();
             },
           ),
-        Text("$title",style: TextStyle(fontSize: middleTitle,color: Colors.white54),)
+        Text(
+          "$title",
+          style: TextStyle(fontSize: middleTitle, color: Colors.white54),
+        )
       ],
     );
   }

@@ -1,3 +1,4 @@
+import 'package:ethan_admin/views/components/Search.dart';
 import 'package:ethan_admin/views/components/SideMenu.dart';
 import 'package:ethan_admin/views/pages/Dashboard.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ class LayoutController extends GetxController {
     if (scaffoldKey.currentState?.isDrawerOpen ?? false) {
       scaffoldKey.currentState?.closeDrawer();
     }
+    SearchController().dispose();
     update();
   }
 

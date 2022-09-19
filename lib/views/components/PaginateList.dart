@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:ethan_admin/config/constants.dart';
 import 'package:ethan_admin/helpers/helper.dart';
+import 'package:ethan_admin/views/components/Search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -9,38 +12,90 @@ class PaginateListController extends GetxController {
   int limit = 10;
   List<String> attributes = [];
   List data = []; // 数据
-  late  MyResponse Function(int page,int limit) getData;
+  late Future<MyResponse> Function(int page, int limit) getData;
+  bool inputPage = false;
+  bool loading = true;
 
-  void changeLimit(int? newLimit) {
-    limit = newLimit ?? 10;
-    page = 1;
-    data = [];
+  Future<void> change() async {
+    loading = true;
     update();
-    setData();
-  }
-
-  void changePage(int newPage) {
-    page = newPage;
-    setData();
-  }
-
-  void setData(){
-    MyResponse res = getData(page,limit);
+    var res = await getData.call(page, limit);
+    loading = false;
     data = res.data['data'];
     total = res.data['total'];
     update();
   }
 
-  MyResponse testData(int page,int limit) {
-    var response = new MyResponse();
-    response.data['total'] = 0;
+  get pages => (total + limit - 1) ~/ limit;
+
+  get firstPage => page <= 1
+      ? null
+      : () {
+          page = 1;
+          change();
+        };
+
+  get beforePage => page <= 1
+      ? null
+      : () {
+          page -= 1;
+          change();
+        };
+
+  get nextPage => page >= pages
+      ? null
+      : () {
+          page += 1;
+          change();
+        };
+
+  get lastPage => page >= pages
+      ? null
+      : () {
+          page = pages;
+          change();
+        };
+
+  get selectPage => () {
+        inputPage = !inputPage;
+        update();
+      };
+
+  get currentWidget {
+    if (!inputPage) {
+      return Text("$page/$pages");
+    } else {
+      return SizedBox(
+          width: 37,
+          height: 16,
+          child: TextField(
+            autofocus: true,
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.number,
+            style: TextStyle(textBaseline: TextBaseline.alphabetic),
+            cursorColor: Colors.white70,
+            onSubmitted: (d) {
+              page = int.parse(d);
+              inputPage = false;
+              change();
+            },
+          ));
+    }
+  }
+
+  static Future<MyResponse> testData(int page, int limit) async {
+    var response = MyResponse();
+    response.data['total'] = 1000;
     response.data['page'] = page;
     response.data['limit'] = limit;
     response.data['data'] = [];
-    for (var i = 1; i <= limit; i++) {
-      response.data['data']
-          .add({"id": i + limit* (page - 1), "name": "Text Name Page $page"});
+    if (page <= (1000 + limit - 1) ~/ limit) {
+      for (var i = 1; i <= limit; i++) {
+        response.data['data'].add(
+            {"id": i + limit * (page - 1), "name": "Text Name Page $page"});
+      }
     }
+    await Future.delayed(Duration(milliseconds: 300));
     return response;
   }
 }
@@ -48,53 +103,75 @@ class PaginateListController extends GetxController {
 // 分页列表
 class PaginateList extends StatelessWidget {
   final PaginateListController plc = Get.put(PaginateListController());
-  List<String> attributes;
+
   String? header;
 
   PaginateList({
     Key? key,
-    required this.attributes,
-    required MyResponse Function(int page,int limit) getData,
+    required List<String> attributes,
+    required Future<MyResponse> Function(int page, int limit) getData,
     this.header,
   }) {
-    plc.attributes = this.attributes;
+    plc.attributes = attributes;
     plc.getData = getData;
-    plc.setData();
+    plc.change();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<DataColumn> columns = attributes.map((e) {
+    List<DataColumn> columns = plc.attributes.map((e) {
       return DataColumn(label: Text(e));
     }).toList();
-    List<DataRow> rows = plc.data.map((e) {
-      return DataRow(cells:plc.attributes.map((k) => DataCell(Text(e[k].toString()))).toList());
-    }).toList();
     return GetBuilder<PaginateListController>(builder: (_) {
+      List<DataRow> rows = plc.data.map((e) {
+        return DataRow(
+            cells: plc.attributes
+                .map((k) => DataCell(Text(e[k].toString())))
+                .toList());
+      }).toList();
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "$header",
-            style: Theme.of(context).textTheme.subtitle1,
-          ),
-          SizedBox(
-            width: double.infinity,
-            child: DataTable(
-              horizontalMargin: 0,
-              columnSpacing: defaultPadding,
-              columns: columns,
-              rows: rows,
+          Padding(
+            padding: const EdgeInsets.all(defaultPadding),
+            child: Text(
+              "$header",
+              style: Theme.of(context).textTheme.subtitle1,
             ),
           ),
-          ButtonBar(
-            alignment: MainAxisAlignment.center,
-            children: [
-            ElevatedButton(onPressed: () {}, child: Text('1')),
-            ElevatedButton(onPressed: () {}, child: Text('2')),
-            ElevatedButton(onPressed: () {}, child: Text('3')),
-            ElevatedButton(onPressed: () {}, child: Text('4')),
-          ],)
+          Padding(
+            padding: const EdgeInsets.all(defaultPadding),
+            child: SizedBox(
+              width: double.infinity,
+              child: plc.loading ? Center(child: CircularProgressIndicator(),) : DataTable(
+                horizontalMargin: 0,
+                columnSpacing: defaultPadding,
+                columns: columns,
+                rows: rows,
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(defaultPadding),
+            child: ButtonBar(
+              alignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: plc.firstPage,
+                  child: Icon(Icons.first_page),
+                ),
+                ElevatedButton(
+                    onPressed: plc.beforePage,
+                    child: Icon(Icons.navigate_before)),
+                ElevatedButton(
+                    onPressed: plc.selectPage, child: plc.currentWidget),
+                ElevatedButton(
+                    onPressed: plc.nextPage, child: Icon(Icons.navigate_next)),
+                ElevatedButton(
+                    onPressed: plc.lastPage, child: Icon(Icons.last_page)),
+              ],
+            ),
+          )
         ],
       );
     });
