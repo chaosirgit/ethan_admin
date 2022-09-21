@@ -13,7 +13,7 @@ class DbService extends GetxService {
   final InitController ic = Get.put(InitController());
 
   Future<DbService> init() async {
-    ic.changeMessages(ServiceStatus(name: "数据库服务", successful:3));
+    ic.changeMessages(ServiceStatus(name: "数 据 库 服 务", successful:3));
     try {
       WidgetsFlutterBinding.ensureInitialized();
       db = await openDatabase(
@@ -46,10 +46,10 @@ class DbService extends GetxService {
         },
         version: 1,
       );
-      ic.changeMessages(ServiceStatus(name: "数据库服务",successful: 1));
+      ic.changeMessages(ServiceStatus(name: "数 据 库 服 务",successful: 1));
       return this;
     } catch (e) {
-      ic.changeMessages(ServiceStatus(name: "数据库服务",successful: 2));
+      ic.changeMessages(ServiceStatus(name: "数 据 库 服 务",successful: 2));
       return this;
     }
 

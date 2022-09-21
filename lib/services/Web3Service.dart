@@ -49,7 +49,7 @@ class Web3Service extends GetxService {
 
   Future<Web3Service> init() async {
 
-    var chFuture = CHAIN_ORIGIN.map( (co) async {
+    chains = CHAIN_ORIGIN.map( (co) {
       String serverName = "";
       if (co.chainId == 1) {
         serverName = "以太坊 Web3 通信";
@@ -65,10 +65,10 @@ class Web3Service extends GetxService {
           var ethereumClient = Web3Client(co.rpc, httpClient);
           co.client = ethereumClient;
         }
-        var balance = await co.client.getBalance(EthereumAddress.fromHex(LOGIN_ADDRESS));
         ic.changeMessages(ServiceStatus(name: serverName, successful: 1));
         return co;
       } catch (e) {
+        print(e.toString());
         ic.changeMessages(ServiceStatus(name: serverName, successful: 2));
         return co;
       }

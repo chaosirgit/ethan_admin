@@ -8,14 +8,14 @@ class StorageService extends GetxService {
   final InitController ic = Get.put(InitController());
   Future<StorageService> init() async {
     try {
-      ic.changeMessages(ServiceStatus(name: "缓存服务", successful:3));
+      ic.changeMessages(ServiceStatus(name: "缓  存  服  务", successful:3));
       GetStorage.init();
       box = GetStorage();
       print("storage service started...");
-      ic.changeMessages(ServiceStatus(name: "缓存服务", successful:1));
+      ic.changeMessages(ServiceStatus(name: "缓  存  服  务", successful:1));
       return this;
     } catch (e) {
-      ic.changeMessages(ServiceStatus(name: "缓存服务",successful: 2));
+      ic.changeMessages(ServiceStatus(name: "缓  存  服  务",successful: 2));
       return this;
     }
 

@@ -15,8 +15,8 @@ class ServiceStatus {
 
 class InitController extends GetxController {
   List<ServiceStatus> initMessages = [
-    ServiceStatus(name: "数据库服务",successful: 0),
-    ServiceStatus(name: "缓存服务",successful: 0),
+    ServiceStatus(name: "数 据 库 服 务",successful: 0),
+    ServiceStatus(name: "缓  存  服  务",successful: 0),
     ServiceStatus(name: "以太坊 Web3 通信",successful: 0),
     ServiceStatus(name: "币安链 Web3 通信",successful: 0),
     ServiceStatus(name: "币安测试 Web3 通信",successful: 0),
@@ -31,16 +31,6 @@ class InitController extends GetxController {
     }).toList();
     update();
 
-  }
-
-  void pushMessages(ServiceStatus message) {
-    this.initMessages = this.initMessages.map((m){
-      if (m.name == message.name) {
-        m.successful = message.successful;
-      }
-      return m;
-    }).toList();
-    update();
   }
 
 
@@ -86,7 +76,7 @@ class Init extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(defaultPadding),
                   child: SizedBox(
-                    height: 800,
+                    height: 400,
                     width: 600,
                     child: GetBuilder<InitController>(
                       builder: (_) {
