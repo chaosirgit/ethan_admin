@@ -3,9 +3,10 @@ import 'package:ethan_admin/routes/router.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-void main() {
+void main() async {
   runApp(const App());
 }
+
 
 class App extends StatelessWidget {
   const App({Key? key}) : super(key: key);
@@ -20,7 +21,7 @@ class App extends StatelessWidget {
         canvasColor: secondaryColor,
       ),
       getPages: routes, // 路由
-      initialRoute: "/", // 根路由
+      initialRoute: "/init", // 根路由
     );
   }
 }

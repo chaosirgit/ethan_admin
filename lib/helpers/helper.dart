@@ -43,4 +43,10 @@ class MyRequest extends GetConnect {
     var res = await req.post(url, data);
     return MyResponse.fromJsonString(res.bodyString as String);
   }
+
+  static Future<Response> getUrl(String url) async {
+    var req = GetConnect();
+    var res = await req.get(url);
+    return res;
+  }
 }

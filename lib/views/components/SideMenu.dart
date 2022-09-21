@@ -36,14 +36,14 @@ class SideMenuController extends GetxController {
           )),
       new SideMenuRow(
           title: 'Form Page',
-          onTap: () => print('3'),
+          onTap: () => Get.toNamed('/dashboard'),
           leading: Icon(
             Icons.sanitizer,
             color: Colors.orange,
           )),
       new SideMenuRow(
           title: 'Card Page',
-          onTap: () => print('4'),
+          onTap: () => lc.changeCurrent(MyList()),
           leading: Icon(
             Icons.sanitizer,
             color: Colors.orange,
