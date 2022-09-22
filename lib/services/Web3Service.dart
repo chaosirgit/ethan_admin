@@ -40,7 +40,7 @@ final List<ChainOrigin> CHAIN_ORIGIN = <ChainOrigin>[
   ChainOrigin.create(
       chainId: 97,
       rpc: "https://data-seed-prebsc-1-s1.binance.org:8545",
-      saleMaster: "0x6AbA79C15B3a59672c57A8276Ed8fa5f2EdC4Feb"),
+      saleMaster: BNB_TEST_SALE_MASTER_ADDRESS),
 ];
 
 class Web3Service extends GetxService {

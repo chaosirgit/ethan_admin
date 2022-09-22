@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:web3dart/web3dart.dart';
 
 class MyResponse {
   int code;
@@ -49,4 +51,10 @@ class MyRequest extends GetConnect {
     var res = await req.get(url);
     return res;
   }
+}
+
+Future<DeployedContract> getContract(String filename,String address) async {
+  var abiStr = await rootBundle.loadString('lib/resources/abis/$filename');
+  var Contract = DeployedContract(ContractAbi.fromJson(abiStr, ''), EthereumAddress.fromHex(address));
+  return Contract;
 }
