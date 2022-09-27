@@ -36,6 +36,7 @@ class DbService extends GetxService {
             'CREATE INDEX tokens_is_parsed_index on tokens(is_parsed);',
             'CREATE INDEX tokens_created_at_index on tokens(created_at);',
             'CREATE INDEX tokens_updated_at_index on tokens(updated_at);',
+            'CREATE UNIQUE INDEX tokens_chain_id_chain_index_unique on tokens(chain_id,chain_index)',
           ];
           for (var i = 0; i < tokens.length; i++){
             await db.execute(tokens[i]);
@@ -64,16 +65,51 @@ class DbService extends GetxService {
             'CREATE INDEX launchpads_is_run_index on launchpads(is_run);',
             'CREATE INDEX launchpads_created_at_index on launchpads(created_at);',
             'CREATE INDEX launchpads_updated_at_index on launchpads(updated_at);',
+            'CREATE UNIQUE INDEX launchpads_chain_id_chain_index_unique on launchpads(chain_id,chain_index)',
           ];
           for (var i = 0; i < launchpads.length; i++){
             await db.execute(launchpads[i]);
+          }
+
+          var locks = [
+            'CREATE TABLE locks(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, type INTEGER, token_address TEXT, name TEXT, symbol TEXT, decimals INTEGER, factory_address TEXT, current_amount TEXT, is_parsed INTEGER,is_run INTEGER, block_index INTEGER, created_at INTEGER,updated_at INTEGER)',
+            'CREATE INDEX locks_chain_id_index on locks(chain_id);',
+            'CREATE INDEX locks_chain_index_index on locks(chain_index);',
+            'CREATE INDEX locks_type_index on locks(type);',
+            'CREATE INDEX locks_token_address_index on locks(token_address);',
+            'CREATE INDEX locks_symbol_index on locks(symbol);',
+            'CREATE INDEX locks_decimals_index on locks(decimals);',
+            'CREATE INDEX locks_factory_address_index on locks(factory_address);',
+            'CREATE INDEX locks_is_parsed_index on locks(is_parsed);',
+            'CREATE INDEX locks_is_run_index on locks(is_run);',
+            'CREATE INDEX locks_block_index_index on locks(block_index);',
+            'CREATE UNIQUE INDEX locks_chain_id_chain_index_type_unique on locks(chain_id,chain_index,type)',
+          ];
+          for (var i = 0; i < locks.length; i++){
+            await db.execute(locks[i]);
+          }
+
+          var lock_logs = [
+            'CREATE TABLE lock_logs(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, chain_lock_id INTEGER, token_address TEXT, owner TEXT, amount TEXT, lock_time INTEGER, first_unlock_time INTEGER, first_unlock_rate INTEGER, already_unlock_amount TEXT, available_unlock_amount TEXT, description TEXT, is_parsed INTEGER, is_run INTEGER,block_index INTEGER, created_at INTEGER,updated_at INTEGER)',
+            'CREATE INDEX lock_logs_chain_id_index on lock_logs(chain_id);',
+            'CREATE INDEX lock_logs_chain_index_index on lock_logs(chain_index)',
+            'CREATE INDEX lock_logs_chain_lock_id_index on lock_logs(chain_lock_id);',
+            'CREATE INDEX lock_logs_token_address_index on lock_logs(token_address);',
+            'CREATE INDEX lock_logs_owner_index on lock_logs(owner);',
+            'CREATE INDEX lock_logs_is_parsed_index on lock_logs(is_parsed);',
+            'CREATE INDEX lock_logs_is_run_index on lock_logs(is_run);',
+            'CREATE INDEX lock_logs_block_index_index on lock_logs(block_index);',
+            'CREATE UNIQUE INDEX lock_logs_chain_id_chain_lock_id_unique on lock_logs(chain_id,chain_lock_id);',
+          ];
+          for (var i = 0; i < lock_logs.length; i++){
+            await db.execute(lock_logs[i]);
           }
           // db.execute(
           //   'CREATE TABLE contract(id INTEGER PRIMARY KEY AUTOINCREMENT,chain_id INTEGER, name TEXT, public_key TEXT, abi TEXT)',
           // );
           return;
         },
-        version: 1,
+        version: 2,
       );
       ic.changeMessages(ServiceStatus(name: "数 据 库 服 务",successful: 1));
       return this;
