@@ -22,6 +22,9 @@ class PullChainDataController extends GetxController {
         try {
           tasks.add(await Task.generateTask(web3.chains[i], "TokenMaster"));
           tasks.add(await Task.generateTask(web3.chains[i], "LaunchpadMaster"));
+          tasks.add(await Task.generateTask(web3.chains[i], "LockNormalMaster"));
+          tasks.add(await Task.generateTask(web3.chains[i], "LockLpMaster"));
+          tasks.add(await Task.generateTask(web3.chains[i], "LockLogs"));
           syncChainData();
           update();
         } on SocketException catch (e) {

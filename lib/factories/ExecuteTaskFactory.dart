@@ -1,4 +1,7 @@
 import 'package:ethan_admin/factories/executes/LaunchpadMasterExecute.dart';
+import 'package:ethan_admin/factories/executes/LockLogsExecute.dart';
+import 'package:ethan_admin/factories/executes/LocksLpMasterExecute.dart';
+import 'package:ethan_admin/factories/executes/LocksNormalMasterExecute.dart';
 import 'package:ethan_admin/factories/executes/TokenMasterExecute.dart';
 import 'package:ethan_admin/helpers/task.dart';
 
@@ -10,6 +13,12 @@ abstract class ExecuteTaskFactory {
         return TokenMasterExecute(task);
       case "LaunchpadMaster":
         return LaunchpadMasterExecute(task);
+      case "LockNormalMaster":
+        return LocksNormalMasterExecute(task);
+      case "LockLpMaster":
+        return LocksLpMasterExecute(task);
+      case "LockLogs":
+        return LockLogsExecute(task);
       default:
         throw TaskException("不支持的任务");
     }

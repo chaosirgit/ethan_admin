@@ -6,9 +6,10 @@ import 'package:ethan_admin/models/Tokens.dart';
 import 'package:web3dart/credentials.dart';
 
 class TokenMasterExecute implements ExecuteTaskFactory {
+  @override
   Task task;
   bool _lock = false;
-  TokenMasterExecute(Task this.task);
+  TokenMasterExecute(this.task);
 
   // 获取开始索引
   Future<int> getStartIndex() async {

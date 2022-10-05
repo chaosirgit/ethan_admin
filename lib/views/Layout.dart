@@ -66,6 +66,7 @@ class Layout extends StatelessWidget {
               },),
             ),
             Expanded(
+              flex: 2,
               child: PullChainData(),
             ),
           ])),

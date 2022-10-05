@@ -16,6 +16,7 @@ class DbService extends GetxService {
     ic.changeMessages(ServiceStatus(name: "数 据 库 服 务", successful:3));
     try {
       WidgetsFlutterBinding.ensureInitialized();
+      print(await getDatabasesPath());
       db = await openDatabase(
         join(await getDatabasesPath(), 'admin.db'),
         onCreate: (db, version) async {
@@ -90,7 +91,7 @@ class DbService extends GetxService {
           }
 
           var lock_logs = [
-            'CREATE TABLE lock_logs(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, chain_lock_id INTEGER, token_address TEXT, owner TEXT, amount TEXT, lock_time INTEGER, first_unlock_time INTEGER, first_unlock_rate INTEGER, already_unlock_amount TEXT, available_unlock_amount TEXT, description TEXT, is_parsed INTEGER, is_run INTEGER,block_index INTEGER, created_at INTEGER,updated_at INTEGER)',
+            'CREATE TABLE lock_logs(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, chain_lock_id INTEGER, token_address TEXT, owner TEXT, amount TEXT, lock_time INTEGER, first_unlock_time INTEGER, first_unlock_rate INTEGER, unlock_cycle INTEGER, unlock_cycle_rate INTEGER, already_unlock_amount TEXT,description TEXT, is_parsed INTEGER, is_run INTEGER,block_index INTEGER, created_at INTEGER,updated_at INTEGER)',
             'CREATE INDEX lock_logs_chain_id_index on lock_logs(chain_id);',
             'CREATE INDEX lock_logs_chain_index_index on lock_logs(chain_index)',
             'CREATE INDEX lock_logs_chain_lock_id_index on lock_logs(chain_lock_id);',
