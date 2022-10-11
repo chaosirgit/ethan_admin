@@ -1,7 +1,13 @@
+import 'package:ethan_admin/factories/executes/AirdropLogsRandomExecute.dart';
+import 'package:ethan_admin/factories/executes/AirdropLogsTopExecute.dart';
+import 'package:ethan_admin/factories/executes/AirdropsExecute.dart';
+import 'package:ethan_admin/factories/executes/LaunchpadLogsExecute.dart';
 import 'package:ethan_admin/factories/executes/LaunchpadMasterExecute.dart';
 import 'package:ethan_admin/factories/executes/LockLogsExecute.dart';
 import 'package:ethan_admin/factories/executes/LocksLpMasterExecute.dart';
 import 'package:ethan_admin/factories/executes/LocksNormalMasterExecute.dart';
+import 'package:ethan_admin/factories/executes/StakesExecute.dart';
+import 'package:ethan_admin/factories/executes/StakingLogsExecute.dart';
 import 'package:ethan_admin/factories/executes/TokenMasterExecute.dart';
 import 'package:ethan_admin/helpers/task.dart';
 
@@ -13,12 +19,24 @@ abstract class ExecuteTaskFactory {
         return TokenMasterExecute(task);
       case "LaunchpadMaster":
         return LaunchpadMasterExecute(task);
+      case "LaunchpadLogs":
+        return LaunchpadLogsExecute(task);
       case "LockNormalMaster":
         return LocksNormalMasterExecute(task);
       case "LockLpMaster":
         return LocksLpMasterExecute(task);
       case "LockLogs":
         return LockLogsExecute(task);
+      case "Stakes":
+        return StakesExecute(task);
+      case "StakingLogs":
+        return StakingLogsExecute(task);
+      case "Airdrops":
+        return AirdropsExecute(task);
+      case "AirdropLogsTop":
+        return AirdropLogsTopExecute(task);
+      case "AirdropLogsRandom":
+        return AirdropLogsRandomExecute(task);
       default:
         throw TaskException("不支持的任务");
     }

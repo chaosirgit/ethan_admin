@@ -27,6 +27,7 @@ class Task {
   DeployedContract? launchpadMasterContract;
   DeployedContract? helperMasterContract;
   DeployedContract? lockMasterContract;
+  DeployedContract? stakingMasterContract;
   ChainOrigin web3;
   bool running;
   bool _lock = false;
@@ -44,11 +45,12 @@ class Task {
       this.launchpadMasterContract,
       this.helperMasterContract,
       this.lockMasterContract,
+      this.stakingMasterContract,
       required this.web3,
       this.running = true});
 
   String toString() {
-    return "Task: {name: $name,contractName: $contractName,progress: $progress,address: $address,chainName: $chainName,chainId: $chainId,externMasterContract: $externMasterContract, referralMasterContract: $referralMasterContract,tokenMasterContract: $tokenMasterContract,launchpadMasterContract: $launchpadMasterContract,helperMasterContract: $helperMasterContract,lockMasterContract: $lockMasterContract,running: $running,web3: $web3}";
+    return "Task: {name: $name,contractName: $contractName,progress: $progress,address: $address,chainName: $chainName,chainId: $chainId,externMasterContract: $externMasterContract, referralMasterContract: $referralMasterContract,tokenMasterContract: $tokenMasterContract,launchpadMasterContract: $launchpadMasterContract,helperMasterContract: $helperMasterContract,lockMasterContract: $lockMasterContract, stakingMasterContract: $stakingMasterContract, running: $running,web3: $web3}";
   }
 
   static Future<Task> generateTask(ChainOrigin co, String contractName) async {
@@ -86,6 +88,7 @@ class Task {
     var launchpadMasterContract = null;
     var helperMasterContract = null;
     var lockMasterContract = null;
+    var stakingMasterContract = null;
     var contractAddress = "";
     switch (contractName) {
       case "TokenMaster":
@@ -102,7 +105,7 @@ class Task {
             await getContract('TokenMaster.abi', contractAddress);
         break;
       case "LaunchpadMaster":
-        name = "Launchpad列表";
+        name = "Launchpad 列表";
         var launchpadMasterAddress = await co.client.call(
             contract: saleMasterContract,
             function: saleMasterContract.function('launchpadMasters'),
@@ -127,15 +130,33 @@ class Task {
         helperMasterContract = await getContract(
             'HelperMaster.abi', helperMasterAddress[0].toString());
         break;
+      case "LaunchpadLogs":
+        name = "Launchpad 参与记录列表";
+        // 获取Helper合约
+        var helperMasterAddress = await co.client.call(
+          contract: saleMasterContract,
+          function: saleMasterContract.function('addressOf'),
+          params: [
+            BigInt.from(1001),
+          ],
+        );
+        if (helperMasterAddress.isEmpty) {
+          throw TaskException("未设置 Helper 合约");
+        }
+        helperMasterContract = await getContract(
+            'HelperMaster.abi', helperMasterAddress[0].toString());
+        break;
       case "LockNormalMaster":
         name = "Lock 仓库列表(普通)";
+
         var lockMasterAddress = await co.client.call(
             contract: saleMasterContract,
             function: saleMasterContract.function('locking'), params: []);
         if (lockMasterAddress.isEmpty) {
           throw TaskException("未设置锁仓 lock 合约");
         }
-        lockMasterContract = await getContract('LockMaster.abi', lockMasterAddress[0].toString());
+        contractAddress = lockMasterAddress[0].toString();
+        lockMasterContract = await getContract('LockMaster.abi', contractAddress);
         break;
       case "LockLpMaster":
         name = "Lock 仓库列表(LP)";
@@ -145,7 +166,8 @@ class Task {
         if (lockMasterAddress.isEmpty) {
           throw TaskException("未设置锁仓 lock 合约");
         }
-        lockMasterContract = await getContract('LockMaster.abi', lockMasterAddress[0].toString());
+        contractAddress = lockMasterAddress[0].toString();
+        lockMasterContract = await getContract('LockMaster.abi', contractAddress);
         break;
       case "LockLogs":
         name = "Lock 锁仓记录";
@@ -155,7 +177,38 @@ class Task {
         if (lockMasterAddress.isEmpty) {
           throw TaskException("未设置锁仓 lock 合约");
         }
-        lockMasterContract = await getContract('LockMaster.abi', lockMasterAddress[0].toString());
+        contractAddress = lockMasterAddress[0].toString();
+        lockMasterContract = await getContract('LockMaster.abi', contractAddress);
+        break;
+      case "Stakes":
+        name = "Staking 记录";
+        var stakingMasterAddress = await co.client.call(
+          contract: saleMasterContract,
+          function: saleMasterContract.function('stakingMasters'), params: []);
+        if (stakingMasterAddress.isEmpty) {
+          throw TaskException("未设置 StakingMaster 合约");
+        }
+        contractAddress = stakingMasterAddress[0].toString();
+        stakingMasterContract = await getContract('StakingMaster.abi', contractAddress);
+        break;
+      case "StakingLogs":
+        name = "Staking Logs 记录";
+        break;
+      case "Airdrops":
+        name = "Airdrops 记录";
+        var airdropMasterAddress = await co.client.call(
+          contract: saleMasterContract,
+          function: saleMasterContract.function('airdropMasters'), params: []);
+        if (airdropMasterAddress.isEmpty) {
+          throw TaskException("未设置 AirdropMaster 合约");
+        }
+        contractAddress = airdropMasterAddress[0].toString();
+        break;
+      case "AirdropLogsTop":
+        name = "Airdrop Top 名单记录";
+        break;
+      case "AirdropLogsRandom":
+        name = "Airdrop Random 名单记录";
         break;
       default:
         {
@@ -175,6 +228,7 @@ class Task {
         launchpadMasterContract: launchpadMasterContract,
         helperMasterContract: helperMasterContract,
         lockMasterContract: lockMasterContract,
+        stakingMasterContract: stakingMasterContract,
         web3: co);
   }
 

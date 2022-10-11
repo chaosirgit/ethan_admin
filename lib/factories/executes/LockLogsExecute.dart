@@ -24,7 +24,7 @@ class LockLogsExecute extends ExecuteTaskFactory {
         task.web3.client.call(
             contract: task.lockMasterContract!,
             function: task.lockMasterContract!.function('getLocksForToken'),
-            params: [EthereumAddress.fromHex(tokenAddress),BigInt.from(startIndex),BigInt.from(totalCount - 1)]
+            params: [EthereumAddress.fromHex(tokenAddress),indexArr[0],BigInt.from(totalCount - 1)]
         ).then((res) async {
           if (!_lock){
             try {
@@ -32,7 +32,7 @@ class LockLogsExecute extends ExecuteTaskFactory {
               var chainLogs = res[0] as List;
               if (chainLogs.isNotEmpty){
                 for (var j = 0; j < chainLogs.length; j ++){
-                  var log = await LockLogs().first(where: "chain_id = ? and chain_index = ? and token_address = ?",whereArgs: [task.chainId,j,tokenAddress]);
+                  var log = await LockLogs().first(where: "chain_id = ? and chain_index = ? and token_address = ?",whereArgs: [task.chainId,indexArr[j].toInt(),tokenAddress]);
                   if (log['is_parsed'] != 1) {
                     log['chain_lock_id'] = (chainLogs[j][0] as BigInt).toInt();
                     log['owner'] = chainLogs[j][2].toString();
@@ -110,7 +110,7 @@ class LockLogsExecute extends ExecuteTaskFactory {
 
   @override
   Future<List<BigInt>> getUnParsedChainIndexListByAddress(String tokenAddress) async {
-    var list = await LockLogs().get(where: "chain_id = ? and is_parsed = 0 and token_address = ?", whereArgs: [task.chainId,tokenAddress]);
+    var list = await LockLogs().get(where: "chain_id = ? and is_parsed = 0 and token_address = ?", whereArgs: [task.chainId,tokenAddress], orderBy: "chain_index asc");
     return list.map((e) => BigInt.parse(e['chain_index'].toString())).toList();
   }
 

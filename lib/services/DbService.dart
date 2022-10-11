@@ -72,6 +72,20 @@ class DbService extends GetxService {
             await db.execute(launchpads[i]);
           }
 
+          var launchpad_logs = [
+            'CREATE TABLE launchpad_logs(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, launchpad_address TEXT, address TEXT, amount TEXT, is_parsed INTEGER, is_run INTEGER, created_at INTEGER,updated_at INTEGER)',
+            'CREATE INDEX launchpad_logs_chain_id_index on launchpad_logs(chain_id);',
+            'CREATE INDEX launchpad_logs_chain_index_index on launchpad_logs(chain_index)',
+            'CREATE INDEX launchpad_logs_launchpad_address_index on launchpad_logs(launchpad_address);',
+            'CREATE INDEX launchpad_logs_address_index on launchpad_logs(address);',
+            'CREATE INDEX launchpad_logs_is_parsed_index on launchpad_logs(is_parsed);',
+            'CREATE INDEX launchpad_logs_is_run_index on launchpad_logs(is_run);',
+            'CREATE UNIQUE INDEX launchpad_logs_chain_id_chain_index_unique on launchpad_logs(chain_id,chain_index,launchpad_address);',
+          ];
+          for (var i = 0; i < launchpad_logs.length; i++) {
+            await db.execute(launchpad_logs[i]);
+          }
+
           var locks = [
             'CREATE TABLE locks(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, type INTEGER, token_address TEXT, name TEXT, symbol TEXT, decimals INTEGER, factory_address TEXT, current_amount TEXT, is_parsed INTEGER,is_run INTEGER, block_index INTEGER, created_at INTEGER,updated_at INTEGER)',
             'CREATE INDEX locks_chain_id_index on locks(chain_id);',
@@ -104,6 +118,73 @@ class DbService extends GetxService {
           ];
           for (var i = 0; i < lock_logs.length; i++){
             await db.execute(lock_logs[i]);
+          }
+
+          var stakes = [
+            'CREATE TABLE stakes(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, staking_address TEXT, token_address TEXT, token_name TEXT, token_symbol TEXT, token_decimals INTEGER, reward_address TEXT, reward_name TEXT, reward_symbol TEXT, reward_decimals INTEGER, type INTEGER, start_time INTEGER, end_time INTEGER, lock_period INTEGER, apr INTEGER, pool_cap TEXT, is_parsed INTEGER, is_run INTEGER, created_at INTEGER,updated_at INTEGER)',
+            'CREATE INDEX stakes_chain_id_index on stakes(chain_id);',
+            'CREATE INDEX stakes_chain_index_index on stakes(chain_index)',
+            'CREATE INDEX stakes_staking_address_index on stakes(staking_address);',
+            'CREATE INDEX stakes_token_address_index on stakes(token_address);',
+            'CREATE INDEX stakes_reward_address_index on stakes(reward_address);',
+            'CREATE INDEX stakes_type_index on stakes(type);',
+            'CREATE INDEX stakes_is_parsed_index on stakes(is_parsed);',
+            'CREATE INDEX stakes_is_run_index on stakes(is_run);',
+            'CREATE UNIQUE INDEX stakes_chain_id_chain_index_unique on stakes(chain_id,chain_index);',
+          ];
+          for (var i = 0; i < stakes.length; i++){
+            await db.execute(stakes[i]);
+          }
+
+          var staking_logs = [
+            'CREATE TABLE staking_logs(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, staking_address TEXT, owner TEXT, amount TEXT, unlock_time INTEGER, last_time INTEGER, is_parsed INTEGER, is_run INTEGER, created_at INTEGER,updated_at INTEGER)',
+            'CREATE INDEX staking_logs_chain_id_index on staking_logs(chain_id);',
+            'CREATE INDEX staking_logs_chain_index_index on staking_logs(chain_index)',
+            'CREATE INDEX staking_logs_staking_address_index on staking_logs(staking_address);',
+            'CREATE INDEX staking_logs_owner_index on staking_logs(owner);',
+            'CREATE INDEX staking_logs_unlock_time_index on staking_logs(unlock_time);',
+            'CREATE INDEX staking_logs_last_time_index on staking_logs(last_time);',
+            'CREATE INDEX staking_logs_is_parsed_index on staking_logs(is_parsed);',
+            'CREATE INDEX staking_logs_is_run_index on staking_logs(is_run);',
+            'CREATE UNIQUE INDEX staking_logs_chain_id_chain_index_unique on staking_logs(chain_id,chain_index,staking_address);',
+          ];
+          for (var i = 0; i < staking_logs.length; i++){
+            await db.execute(staking_logs[i]);
+          }
+
+          var airdrops = [
+            'CREATE TABLE airdrops(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, name TEXT, owner TEXT,contract_address TEXT, token_address TEXT, token_name TEXT, token_symbol TEXT,token_decimals INTEGER, invite_address TEXT, start_time INTEGER, end_time INTEGER,top_count INTEGER,top_rewards TEXT,random_count INTEGER,random_rewards TEXT,logo TEXT,website TEXT,banner TEXT,twitter_task TEXT,twitter_point INTEGER,tweets_task TEXT,tweets_point INTEGER, telegram_group_task TEXT, telegram_group_point INTEGER, telegram_channel_task TEXT, telegram_channel_point INTEGER, discord_task TEXT, discord_point INTEGER, youtube_task TEXT, youtube_point INTEGER, custom_task TEXT, custom_point INTEGER, refer_task TEXT, refer_point INTEGER, description TEXT,is_parsed INTEGER,is_run INTEGER,created_at INTEGER,updated_at INTEGER);',
+            'CREATE INDEX airdrops_chain_id_index on airdrops(chain_id);',
+            'CREATE INDEX airdrops_chain_index_index on airdrops(chain_index);',
+            'CREATE INDEX airdrops_owner_index on airdrops(owner);',
+            'CREATE INDEX airdrops_contract_address_index on airdrops(contract_address);',
+            'CREATE INDEX airdrops_token_address_index on airdrops(token_address);',
+            'CREATE INDEX airdrops_invite_address_index on airdrops(invite_address);',
+            'CREATE INDEX airdrops_start_time_index on airdrops(start_time);',
+            'CREATE INDEX airdrops_end_time_index on airdrops(end_time);',
+            'CREATE INDEX airdrops_is_parsed_index on airdrops(is_parsed);',
+            'CREATE INDEX airdrops_is_run_index on airdrops(is_run);',
+            'CREATE INDEX airdrops_created_at_index on airdrops(created_at);',
+            'CREATE INDEX airdrops_updated_at_index on airdrops(updated_at);',
+            'CREATE UNIQUE INDEX airdrops_chain_id_chain_index_unique on airdrops(chain_id,chain_index)',
+          ];
+          for (var i = 0; i < airdrops.length; i++){
+            await db.execute(airdrops[i]);
+          }
+
+          var airdrop_logs = [
+            'CREATE TABLE airdrop_logs(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, airdrop_address TEXT, type INTEGER, address TEXT, rewards TEXT, claimed TEXT, is_parsed INTEGER, is_run INTEGER, created_at INTEGER,updated_at INTEGER)',
+            'CREATE INDEX airdrop_logs_chain_id_index on airdrop_logs(chain_id);',
+            'CREATE INDEX airdrop_logs_chain_index_index on airdrop_logs(chain_index)',
+            'CREATE INDEX airdrop_logs_airdrop_address_index on airdrop_logs(airdrop_address);',
+            'CREATE INDEX airdrop_logs_type_index on airdrop_logs(type);',
+            'CREATE INDEX airdrop_logs_address_index on airdrop_logs(address);',
+            'CREATE INDEX airdrop_logs_is_parsed_index on airdrop_logs(is_parsed);',
+            'CREATE INDEX airdrop_logs_is_run_index on airdrop_logs(is_run);',
+            'CREATE UNIQUE INDEX airdrop_logs_chain_id_chain_index_unique on airdrop_logs(chain_id,chain_index,airdrop_address,type);',
+          ];
+          for (var i = 0; i < airdrop_logs.length; i++){
+            await db.execute(airdrop_logs[i]);
           }
           // db.execute(
           //   'CREATE TABLE contract(id INTEGER PRIMARY KEY AUTOINCREMENT,chain_id INTEGER, name TEXT, public_key TEXT, abi TEXT)',

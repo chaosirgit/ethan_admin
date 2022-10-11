@@ -22,14 +22,26 @@ class PullChainDataController extends GetxController {
         try {
           tasks.add(await Task.generateTask(web3.chains[i], "TokenMaster"));
           tasks.add(await Task.generateTask(web3.chains[i], "LaunchpadMaster"));
+          tasks.add(await Task.generateTask(web3.chains[i], "LaunchpadLogs"));
           tasks.add(await Task.generateTask(web3.chains[i], "LockNormalMaster"));
           tasks.add(await Task.generateTask(web3.chains[i], "LockLpMaster"));
           tasks.add(await Task.generateTask(web3.chains[i], "LockLogs"));
+          tasks.add(await Task.generateTask(web3.chains[i], "Stakes"));
+          tasks.add(await Task.generateTask(web3.chains[i], "StakingLogs"));
+          tasks.add(await Task.generateTask(web3.chains[i], "Airdrops"));
+          tasks.add(await Task.generateTask(web3.chains[i], "AirdropLogsTop"));
+          tasks.add(await Task.generateTask(web3.chains[i], "AirdropLogsRandom"));
           syncChainData();
           update();
         } on SocketException catch (e) {
           print("连接断开: " + web3.chains[i].chainId.toString());
+          Get.snackbar("Error", "RPC 连接丢失 3 秒后尝试重连");
+          await Future.delayed(Duration(seconds: 3));
+          web3.init();
+          init();
         } on TaskException catch (e) {
+          print("$e");
+        } catch (e) {
           print("$e");
         }
       }

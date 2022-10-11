@@ -290,7 +290,7 @@ class LaunchpadMasterExecute implements ExecuteTaskFactory {
 
   @override
   Future<List<BigInt>> getUnParsedChainIndexList() async {
-    var list = await Launchpads().get(where: "chain_id = ? and is_parsed = 0", whereArgs: [task.chainId]);
+    var list = await Launchpads().get(where: "chain_id = ? and is_parsed = 0", whereArgs: [task.chainId],orderBy: "chain_index asc");
     return list.map((e) => BigInt.parse(e['chain_index'].toString())).toList();
   }
 

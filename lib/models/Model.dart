@@ -13,8 +13,10 @@ abstract class Model {
       id = await dbService.db.insert(tableName, toMap());
     } else {
       if (await exists()) {
+        var m = toMap();
+        m['updated_at'] = DateTime.now().millisecondsSinceEpoch ~/ 1000;
         await Model.dbService.db
-            .update(tableName, toMap(), where: 'id = ?', whereArgs: [id]);
+            .update(tableName, m, where: 'id = ?', whereArgs: [id]);
       }
     }
     return this;

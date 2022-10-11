@@ -101,7 +101,7 @@ class LocksLpMasterExecute implements ExecuteTaskFactory {
 
   @override
   Future<List<BigInt>> getUnParsedChainIndexList() async {
-    var list = await Locks().get(where: "chain_id = ? and is_parsed = 0 and type = 2", whereArgs: [task.chainId]);
+    var list = await Locks().get(where: "chain_id = ? and is_parsed = 0 and type = 2", whereArgs: [task.chainId],orderBy: "chain_index asc");
     return list.map((e) => BigInt.parse(e['chain_index'].toString())).toList();
   }
 
