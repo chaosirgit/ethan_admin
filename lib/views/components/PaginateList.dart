@@ -1,7 +1,9 @@
+import 'dart:core';
 import 'dart:io';
 
 import 'package:ethan_admin/config/constants.dart';
 import 'package:ethan_admin/helpers/helper.dart';
+import 'package:ethan_admin/models/Model.dart';
 import 'package:ethan_admin/views/components/Search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,8 +13,9 @@ class PaginateListController extends GetxController {
   int page = 1; //当前页
   int limit = 10;
   List<String> attributes = [];
+  List<String> attributeNames = [];
   List data = []; // 数据
-  late Future<MyResponse> Function(int page, int limit) getData;
+  late Future<PaginateResource> Function(int page, int limit) getData;
   bool inputPage = false;
   bool loading = true;
 
@@ -21,8 +24,8 @@ class PaginateListController extends GetxController {
     update();
     var res = await getData.call(page, limit);
     loading = false;
-    data = res.data['data'];
-    total = res.data['total'];
+    data = res.data;
+    total = res.total;
     update();
   }
 
@@ -109,26 +112,34 @@ class PaginateList extends StatelessWidget {
   PaginateList({
     Key? key,
     required List<String> attributes,
-    required Future<MyResponse> Function(int page, int limit) getData,
+    List<String>? attributeNames,
+    required Future<PaginateResource> Function(int page, int limit) getData,
     this.header,
   }) {
     plc.attributes = attributes;
+    plc.attributeNames = attributeNames ?? [];
     plc.getData = getData;
     plc.change();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<DataColumn> columns = plc.attributes.map((e) {
+    List<DataColumn> columns = plc.attributeNames.isNotEmpty ? plc.attributeNames.map((e) {
+      return DataColumn(label: Text(e));
+    }).toList() : plc.attributes.map((e) {
       return DataColumn(label: Text(e));
     }).toList();
     return GetBuilder<PaginateListController>(builder: (_) {
       List<DataRow> rows = plc.data.map((e) {
         return DataRow(
-            cells: plc.attributes
-                .map((k) => DataCell(Text(e[k].toString())))
-                .toList());
-      }).toList();
+            cells: plc.attributes.map((k) {
+                  if (k == "logo"){
+                    return DataCell(Image.network(e[k].toString(),width: 50,height: 50,));
+                  }else {
+                    return DataCell(Text(e[k].toString()));
+                  }
+            }).toList());
+      }).toList();†
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -143,11 +154,14 @@ class PaginateList extends StatelessWidget {
             padding: const EdgeInsets.all(defaultPadding),
             child: SizedBox(
               width: double.infinity,
-              child: plc.loading ? Center(child: CircularProgressIndicator(),) : DataTable(
-                horizontalMargin: 0,
-                columnSpacing: defaultPadding,
-                columns: columns,
-                rows: rows,
+              child: plc.loading ? Center(child: CircularProgressIndicator(),) : SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  horizontalMargin: 0,
+                  columnSpacing: defaultPadding,
+                  columns: columns,
+                  rows: rows,
+                ),
               ),
             ),
           ),

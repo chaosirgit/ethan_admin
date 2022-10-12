@@ -1,6 +1,15 @@
 import 'package:ethan_admin/services/DbService.dart';
 import 'package:get/get.dart';
 
+class PaginateResource {
+  int page;
+  int limit;
+  int total;
+  List<Map> data;
+
+  PaginateResource({this.page = 1, this.limit = 10, this.total = 0, required this.data});
+}
+
 abstract class Model {
   late final int? id;
   static final dbService = Get.find<DbService>();
@@ -92,6 +101,13 @@ abstract class Model {
       return Map.of(rows.first);
     }
     return fromMap({}).toMap();
+  }
+
+  Future<PaginateResource> paginate({int limit = 10, int page = 1, String? where, List<Object?>? whereArgs, String orderBy = 'id desc'}) async {
+      var total = await count(where: where, whereArgs: whereArgs);
+      var offset = (page - 1) * limit;
+      var data = await get(where: where, whereArgs: whereArgs, limit: limit, orderBy: orderBy,offset: offset);
+      return PaginateResource(data: data,limit: limit,total: total,page: page);
   }
 
 

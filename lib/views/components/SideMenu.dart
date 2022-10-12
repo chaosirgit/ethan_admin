@@ -1,7 +1,7 @@
 import 'package:ethan_admin/config/constants.dart';
 import 'package:ethan_admin/views/Layout.dart';
 import 'package:ethan_admin/views/pages/Dashboard.dart';
-import 'package:ethan_admin/views/pages/MyList.dart';
+import 'package:ethan_admin/views/pages/TokenList.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -28,8 +28,8 @@ class SideMenuController extends GetxController {
             color: Colors.orange,
           )),
       new SideMenuRow(
-          title: 'List Page',
-          onTap: () => lc.changeCurrent(MyList()),
+          title: '代币列表',
+          onTap: () => lc.changeCurrent(TokenList()),
           leading: Icon(
             Icons.list,
             color: Colors.orange,
@@ -37,13 +37,6 @@ class SideMenuController extends GetxController {
       new SideMenuRow(
           title: 'Form Page',
           onTap: () => Get.toNamed('/dashboard'),
-          leading: Icon(
-            Icons.sanitizer,
-            color: Colors.orange,
-          )),
-      new SideMenuRow(
-          title: 'Card Page',
-          onTap: () => lc.changeCurrent(MyList()),
           leading: Icon(
             Icons.sanitizer,
             color: Colors.orange,
