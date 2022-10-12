@@ -29,7 +29,7 @@ class Task {
   DeployedContract? lockMasterContract;
   DeployedContract? stakingMasterContract;
   ChainOrigin web3;
-  bool running;
+  int running; // 1 开始 2 停止 3 完成
   bool _lock = false;
 
   Task(
@@ -47,7 +47,7 @@ class Task {
       this.lockMasterContract,
       this.stakingMasterContract,
       required this.web3,
-      this.running = true});
+      this.running = 1});
 
   String toString() {
     return "Task: {name: $name,contractName: $contractName,progress: $progress,address: $address,chainName: $chainName,chainId: $chainId,externMasterContract: $externMasterContract, referralMasterContract: $referralMasterContract,tokenMasterContract: $tokenMasterContract,launchpadMasterContract: $launchpadMasterContract,helperMasterContract: $helperMasterContract,lockMasterContract: $lockMasterContract, stakingMasterContract: $stakingMasterContract, running: $running,web3: $web3}";
@@ -233,19 +233,16 @@ class Task {
   }
 
   Future<void> execute() async {
-    if (progress < 1.0 && running) {
-      while (running) {
-        progress = await ExecuteTaskFactory.getFactory(this).execute(1);
-      }
+    while (running == 1) {
+      progress = await ExecuteTaskFactory.getFactory(this).execute(1);
     }
   }
 
   Future<void> cancel() async {
-    running = false;
+    running = 2;
   }
 
   Future<void> start() async {
-    running = true;
-    execute();
+    running = 1;
   }
 }

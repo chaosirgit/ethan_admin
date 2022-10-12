@@ -236,7 +236,7 @@ class TokenMasterExecute implements ExecuteTaskFactory {
     await Future.delayed(Duration(seconds: seconds));
     var p = parsedCount / totalCount;
     if (p == 1.0) {
-      task.running = false;
+      task.running = 3;
     }
     return p;
   }

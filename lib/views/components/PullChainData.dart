@@ -16,33 +16,21 @@ class PullChainDataController extends GetxController {
   bool check = false;
 
   Future<void> init() async {
-    tasks.value = [];
-    for (var i = 0; i < web3.chains.length; i++) {
-      if (web3.chains[i].saleMaster != "") {
-        try {
-          tasks.add(await Task.generateTask(web3.chains[i], "TokenMaster"));
-          tasks.add(await Task.generateTask(web3.chains[i], "LaunchpadMaster"));
-          tasks.add(await Task.generateTask(web3.chains[i], "LaunchpadLogs"));
-          tasks.add(await Task.generateTask(web3.chains[i], "LockNormalMaster"));
-          tasks.add(await Task.generateTask(web3.chains[i], "LockLpMaster"));
-          tasks.add(await Task.generateTask(web3.chains[i], "LockLogs"));
-          tasks.add(await Task.generateTask(web3.chains[i], "Stakes"));
-          tasks.add(await Task.generateTask(web3.chains[i], "StakingLogs"));
-          tasks.add(await Task.generateTask(web3.chains[i], "Airdrops"));
-          tasks.add(await Task.generateTask(web3.chains[i], "AirdropLogsTop"));
-          tasks.add(await Task.generateTask(web3.chains[i], "AirdropLogsRandom"));
-          syncChainData();
-          update();
-        } on SocketException catch (e) {
-          print("连接断开: " + web3.chains[i].chainId.toString());
-          Get.snackbar("Error", "RPC 连接丢失 3 秒后尝试重连");
-          await Future.delayed(Duration(seconds: 3));
-          web3.init();
-          init();
-        } on TaskException catch (e) {
-          print("$e");
-        } catch (e) {
-          print("$e");
+    if (tasks.value.isEmpty) {
+      for (var i = 0; i < web3.chains.length; i++) {
+        if (web3.chains[i].saleMaster != "") {
+            tasks.add(await Task.generateTask(web3.chains[i], "TokenMaster"));
+            tasks.add(await Task.generateTask(web3.chains[i], "LaunchpadMaster"));
+            tasks.add(await Task.generateTask(web3.chains[i], "LaunchpadLogs"));
+            tasks.add(await Task.generateTask(web3.chains[i], "LockNormalMaster"));
+            tasks.add(await Task.generateTask(web3.chains[i], "LockLpMaster"));
+            tasks.add(await Task.generateTask(web3.chains[i], "LockLogs"));
+            tasks.add(await Task.generateTask(web3.chains[i], "Stakes"));
+            tasks.add(await Task.generateTask(web3.chains[i], "StakingLogs"));
+            tasks.add(await Task.generateTask(web3.chains[i], "Airdrops"));
+            tasks.add(await Task.generateTask(web3.chains[i], "AirdropLogsTop"));
+            tasks.add(await Task.generateTask(web3.chains[i], "AirdropLogsRandom"));
+            syncChainData();
         }
       }
     }
@@ -51,6 +39,7 @@ class PullChainDataController extends GetxController {
   Future<void> stop() async {
     for (var i = 0; i < tasks.value.length; i++) {
       tasks.value[i].cancel();
+      update();
     }
     check = false;
     update();
@@ -59,16 +48,33 @@ class PullChainDataController extends GetxController {
   Future<void> start() async {
     for (var i = 0; i < tasks.value.length; i++) {
       tasks.value[i].start();
+      update();
     }
-    check = true;
+    syncChainData();
     update();
   }
 
   Future<void> syncChainData() async {
     for (var i = 0; i < tasks.length; i++) {
       //异步 发送任务
-      if (tasks.value[i].progress < 1.0) {
-        tasks.value[i].execute();
+      if (tasks.value[i].progress <= 1.0) {
+        try {
+          tasks.value[i].execute();
+          update();
+        } on SocketException catch (e) {
+          print("连接断开: " + tasks.value[i].web3.chainId.toString());
+          Get.snackbar("Error", "RPC 连接丢失 3 秒后尝试重连");
+          await Future.delayed(Duration(seconds: 3));
+          tasks.value[i].web3.resetClient();
+          init();
+          break;
+        } on TaskException catch (e) {
+          Get.snackbar("Error", "$e");
+          break;
+        } catch (e) {
+          print("$e");
+          break;
+        }
       }
     }
     check = true;
@@ -76,7 +82,7 @@ class PullChainDataController extends GetxController {
     while (check) {
       await Future.delayed(Duration(seconds:1), () async {
         var done = tasks.value.where((task) {
-          return task.progress < 1.0;
+          return task.running == 1;
         }).toList();
         if (done.isEmpty) {
           check = false;
@@ -119,14 +125,6 @@ class PullChainData extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
                             onPressed: () {
-                              pcdc.init();
-                            },
-                            child: Icon(Icons.sync)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton(
-                            onPressed: () {
                               pcdc.start();
                             },
                             style: ButtonStyle(
@@ -158,15 +156,32 @@ class PullChainData extends StatelessWidget {
               builder: (_) {
                 var children = <Widget>[];
                 for (var i = 0; i < pcdc.tasks.length; i++) {
+                  var icon = Icon(Icons.access_time_filled);
+                  if (pcdc.tasks.value[i].running == 1) {
+                    icon = Icon(Icons.downloading,color: Colors.orangeAccent,);
+                  }else if (pcdc.tasks.value[i].running == 3){
+                    icon = Icon(Icons.check_circle,color: Colors.green);
+                  }else {
+                    icon = Icon(Icons.pause_sharp,color: Colors.red);
+                  }
                   children.add(Padding(
                     padding: const EdgeInsets.all(defaultPadding),
                     child: Column(
                       children: [
-                        Text(
-                          pcdc.tasks.value[i].chainName +
-                              "-" +
-                              pcdc.tasks.value[i].name,
-                          style: TextStyle(fontSize: title),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                pcdc.tasks.value[i].chainName +
+                                    "-" +
+                                    pcdc.tasks.value[i].name,
+                                style: TextStyle(fontSize: title),
+                                softWrap: false,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            icon,
+                          ],
                         ),
                         SizedBox(
                           height: defaultPadding,

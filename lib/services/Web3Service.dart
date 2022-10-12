@@ -23,6 +23,11 @@ class ChainOrigin {
     return "ChainOrigin: {chainId:$chainId, rpc:$rpc, saleMaster:$saleMaster}";
   }
 
+  resetClient() {
+    var httpClient = Client();
+    this.client = Web3Client(this.rpc, httpClient);
+  }
+
   factory ChainOrigin.create({chainId, rpc, saleMaster}) {
     return ChainOrigin(chainId: chainId, rpc: rpc, saleMaster: saleMaster);
   }

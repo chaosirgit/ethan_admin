@@ -63,7 +63,7 @@ class StakesExecute implements ExecuteTaskFactory {
   Future<double> execute(int seconds) async {
     var totalCount = await getTotalCount();
     if (totalCount == 0){
-      task.running = false;
+      task.running = 3;
       return 1.0;
     }
     var startIndex = await getStartIndex();
@@ -173,7 +173,7 @@ class StakesExecute implements ExecuteTaskFactory {
 
     var p = parsedCount / totalCount;
     if (p == 1.0) {
-      task.running = false;
+      task.running = 3;
     }
     return p;
   }
