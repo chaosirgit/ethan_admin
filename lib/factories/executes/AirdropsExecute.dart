@@ -198,6 +198,10 @@ class AirdropsExecute extends ExecuteTaskFactory {
     var parsedCount = await Airdrops().count(
         where: "chain_id = ? and is_parsed = 1", whereArgs: [task.chainId]);
     await Future.delayed(Duration(seconds: seconds));
+    if (totalCount == 0){
+      task.running = 3;
+      return 1.0;
+    }
     var p = parsedCount / totalCount;
     if (p == 1.0) {
       task.running = 3;

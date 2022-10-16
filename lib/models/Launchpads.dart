@@ -14,8 +14,13 @@ class Launchpads extends Model {
   final int type;
   final String contractAddress;
   final String presaleAddress;
+  final String presaleName;
+  final String presaleSymbol;
+  final int presaleDecimals;
   final String payAddress;
+  final String payName;
   final String paySymbol;
+  final int payDecimals;
   final String routerAddress;
   final String inviteAddress;
   final String softCap;
@@ -67,8 +72,13 @@ class Launchpads extends Model {
     this.type = 0,
     this.contractAddress = "",
     this.presaleAddress = "",
+    this.presaleName = "",
+    this.presaleSymbol = "",
+    this.presaleDecimals = 0,
     this.payAddress = "",
+    this.payName = "",
     this.paySymbol = "",
+    this.payDecimals = 0,
     this.routerAddress = "",
     this.inviteAddress = "",
     this.softCap = "0",
@@ -124,8 +134,13 @@ class Launchpads extends Model {
       'type' : type,
       'contract_address' : contractAddress,
       'presale_address' : presaleAddress,
+      'presale_name' : presaleName,
+      'presale_symbol' : presaleSymbol,
+      'presale_decimals'  : presaleDecimals,
       'pay_address' : payAddress,
+      'pay_name'  : payName,
       'pay_symbol' : paySymbol,
+      'pay_decimals'  : payDecimals,
       'router_address' : routerAddress,
       'invite_address' : inviteAddress,
       'soft_cap' : softCap,
@@ -183,8 +198,13 @@ class Launchpads extends Model {
         type: first['type'] ?? 0,
         contractAddress: first['contract_address'] ?? "",
         presaleAddress: first['presale_address'] ?? "",
+        presaleName: first['presale_name'] ?? "",
+        presaleSymbol: first['presale_symbol'] ?? "",
+        presaleDecimals: first['presale_decimals'] ?? 0,
         payAddress: first['pay_address'] ?? "",
+        payName: first['pay_name'] ?? "",
         paySymbol: first['pay_symbol'] ?? "",
+        payDecimals: first['pay_decimals'] ?? 0,
         routerAddress: first['router_address'] ?? "",
         inviteAddress: first['invite_address'] ?? "",
         softCap: first['soft_cap'] ?? "0",

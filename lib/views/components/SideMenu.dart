@@ -1,6 +1,15 @@
 import 'package:ethan_admin/config/constants.dart';
 import 'package:ethan_admin/views/Layout.dart';
+import 'package:ethan_admin/views/pages/AirdropList.dart';
+import 'package:ethan_admin/views/pages/AirdropLogList.dart';
 import 'package:ethan_admin/views/pages/Dashboard.dart';
+import 'package:ethan_admin/views/pages/LaunchpadList.dart';
+import 'package:ethan_admin/views/pages/LaunchpadLogList.dart';
+import 'package:ethan_admin/views/pages/LockLPList.dart';
+import 'package:ethan_admin/views/pages/LockList.dart';
+import 'package:ethan_admin/views/pages/LockLogList.dart';
+import 'package:ethan_admin/views/pages/StakeList.dart';
+import 'package:ethan_admin/views/pages/StakeLogList.dart';
 import 'package:ethan_admin/views/pages/TokenList.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -35,10 +44,66 @@ class SideMenuController extends GetxController {
             color: Colors.orange,
           )),
       new SideMenuRow(
-          title: 'Form Page',
-          onTap: () => Get.toNamed('/dashboard'),
+          title: 'Launchpad 列表',
+          onTap: () => lc.changeCurrent(LaunchpadList()),
           leading: Icon(
-            Icons.sanitizer,
+            Icons.list,
+            color: Colors.orange,
+          )),
+      new SideMenuRow(
+          title: 'Launchpad 参与记录',
+          onTap: () => lc.changeCurrent(LaunchpadLogList()),
+          leading: Icon(
+            Icons.list,
+            color: Colors.orange,
+          )),
+      new SideMenuRow(
+          title: 'Lock 普通仓库列表',
+          onTap: () => lc.changeCurrent(LockList()),
+          leading: Icon(
+            Icons.list,
+            color: Colors.orange,
+          )),
+      new SideMenuRow(
+          title: 'Lock LP仓库列表',
+          onTap: () => lc.changeCurrent(LockLpList()),
+          leading: Icon(
+            Icons.list,
+            color: Colors.orange,
+          )),
+      new SideMenuRow(
+          title: 'Lock 锁仓记录',
+          onTap: () => lc.changeCurrent(LockLogList()),
+          leading: Icon(
+            Icons.list,
+            color: Colors.orange,
+          )),
+      new SideMenuRow(
+          title: 'Staking 列表',
+          onTap: () => lc.changeCurrent(StakeList()),
+          leading: Icon(
+            Icons.list,
+            color: Colors.orange,
+          )),
+      new SideMenuRow(
+          title: 'Staking 记录列表',
+          onTap: () => lc.changeCurrent(StakeLogList()),
+          leading: Icon(
+            Icons.list,
+            color: Colors.orange,
+          )),
+      new SideMenuRow(
+          title: 'Airdrop 项目列表',
+          onTap: () => lc.changeCurrent(AirdropList()),
+          leading: Icon(
+            Icons.list,
+            color: Colors.orange,
+          )),
+      new SideMenuRow(
+          title: 'Airdrop 参与列表',
+          onTap: () => lc.changeCurrent(AirdropLogList()),
+          leading: Icon(
+            Icons.list,
             color: Colors.orange,
           )),
     ];

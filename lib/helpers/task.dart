@@ -233,8 +233,12 @@ class Task {
   }
 
   Future<void> execute() async {
-    while (running == 1) {
-      progress = await ExecuteTaskFactory.getFactory(this).execute(1);
+    try {
+      while (running == 1) {
+        progress = await ExecuteTaskFactory.getFactory(this).execute(1);
+      }
+    }catch (e) {
+      throw e;
     }
   }
 

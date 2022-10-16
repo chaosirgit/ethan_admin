@@ -116,6 +116,7 @@ class PaginateList extends StatelessWidget {
     required Future<PaginateResource> Function(int page, int limit) getData,
     this.header,
   }) {
+    plc.page = 1;
     plc.attributes = attributes;
     plc.attributeNames = attributeNames ?? [];
     plc.getData = getData;
@@ -134,12 +135,13 @@ class PaginateList extends StatelessWidget {
         return DataRow(
             cells: plc.attributes.map((k) {
                   if (k == "logo"){
-                    return DataCell(Image.network(e[k].toString(),width: 50,height: 50,));
+                    return DataCell(Padding(padding: const EdgeInsets.all(5.0),
+                    child: Image.network(e[k].toString(),width: 50,height: 50,)));
                   }else {
                     return DataCell(Text(e[k].toString()));
                   }
             }).toList());
-      }).toList();†
+      }).toList();
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -154,13 +156,15 @@ class PaginateList extends StatelessWidget {
             padding: const EdgeInsets.all(defaultPadding),
             child: SizedBox(
               width: double.infinity,
-              child: plc.loading ? Center(child: CircularProgressIndicator(),) : SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: DataTable(
-                  horizontalMargin: 0,
-                  columnSpacing: defaultPadding,
-                  columns: columns,
-                  rows: rows,
+              child: plc.loading ? Center(child: CircularProgressIndicator(),) : Center(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    horizontalMargin: 0,
+                    columnSpacing: defaultPadding,
+                    columns: columns,
+                    rows: rows,
+                  ),
                 ),
               ),
             ),

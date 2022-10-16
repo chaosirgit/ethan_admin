@@ -43,7 +43,7 @@ class DbService extends GetxService {
             await db.execute(tokens[i]);
           }
           var launchpads = [
-            'CREATE TABLE launchpads(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER,publisher TEXT, owner TEXT, type INTEGER,contract_address TEXT, presale_address TEXT, pay_address TEXT, pay_symbol TEXT,router_address TEXT, invite_address TEXT, soft_cap TEXT, hard_cap TEXT,min_purchase TEXT,max_purchase TEXT,rate INTEGER,price TEXT,token_fee INTEGER,pay_fee INTEGER,rewards_token_type INTEGER,first_level INTEGER,second_level INTEGER,referral_buy INTEGER,sale_type INTEGER, change_public INTEGER, undone_process INTEGER, liquidity_rate INTEGER,liquidity_lock_time INTEGER,first_unlock_rate INTEGER,next_unlock_rate INTEGER,unlock_cycle_time INTEGER,begin_at INTEGER,end_at INTEGER,is_kyc INTEGER,is_audit INTEGER,logo TEXT, website TEXT, twitter TEXT, telegram TEXT, discord TEXT,facebook TEXT, github TEXT,instagram TEXT,reddit TEXT, description TEXT,is_parsed INTEGER,is_run INTEGER,created_at INTEGER,updated_at INTEGER);',
+            'CREATE TABLE launchpads(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER,publisher TEXT, owner TEXT, type INTEGER,contract_address TEXT, presale_address TEXT, presale_name TEXT, presale_symbol TEXT, presale_decimals INTEGER,pay_address TEXT, pay_name TEXT,pay_symbol TEXT, pay_decimals INTEGER, router_address TEXT, invite_address TEXT, soft_cap TEXT, hard_cap TEXT,min_purchase TEXT,max_purchase TEXT,rate INTEGER,price TEXT,token_fee INTEGER,pay_fee INTEGER,rewards_token_type INTEGER,first_level INTEGER,second_level INTEGER,referral_buy INTEGER,sale_type INTEGER, change_public INTEGER, undone_process INTEGER, liquidity_rate INTEGER,liquidity_lock_time INTEGER,first_unlock_rate INTEGER,next_unlock_rate INTEGER,unlock_cycle_time INTEGER,begin_at INTEGER,end_at INTEGER,is_kyc INTEGER,is_audit INTEGER,logo TEXT, website TEXT, twitter TEXT, telegram TEXT, discord TEXT,facebook TEXT, github TEXT,instagram TEXT,reddit TEXT, description TEXT,is_parsed INTEGER,is_run INTEGER,created_at INTEGER,updated_at INTEGER);',
             'CREATE INDEX launchpads_chain_id_index on launchpads(chain_id);',
             'CREATE INDEX launchpads_chain_index_index on launchpads(chain_index);',
             'CREATE INDEX launchpads_publisher_index on launchpads(publisher);',
@@ -87,21 +87,42 @@ class DbService extends GetxService {
           }
 
           var locks = [
-            'CREATE TABLE locks(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, type INTEGER, token_address TEXT, name TEXT, symbol TEXT, decimals INTEGER, factory_address TEXT, current_amount TEXT, is_parsed INTEGER,is_run INTEGER, block_index INTEGER, created_at INTEGER,updated_at INTEGER)',
+            'CREATE TABLE locks(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, token_address TEXT, name TEXT, symbol TEXT, decimals INTEGER, current_amount TEXT, is_parsed INTEGER,is_run INTEGER, block_index INTEGER, created_at INTEGER,updated_at INTEGER)',
             'CREATE INDEX locks_chain_id_index on locks(chain_id);',
             'CREATE INDEX locks_chain_index_index on locks(chain_index);',
-            'CREATE INDEX locks_type_index on locks(type);',
             'CREATE INDEX locks_token_address_index on locks(token_address);',
             'CREATE INDEX locks_symbol_index on locks(symbol);',
             'CREATE INDEX locks_decimals_index on locks(decimals);',
-            'CREATE INDEX locks_factory_address_index on locks(factory_address);',
             'CREATE INDEX locks_is_parsed_index on locks(is_parsed);',
             'CREATE INDEX locks_is_run_index on locks(is_run);',
             'CREATE INDEX locks_block_index_index on locks(block_index);',
-            'CREATE UNIQUE INDEX locks_chain_id_chain_index_type_unique on locks(chain_id,chain_index,type)',
+            'CREATE UNIQUE INDEX locks_chain_id_chain_index_unique on locks(chain_id,chain_index)',
           ];
           for (var i = 0; i < locks.length; i++){
             await db.execute(locks[i]);
+          }
+
+          var lock_lps = [
+            'CREATE TABLE lock_lps(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, token_address TEXT, name TEXT, symbol TEXT, decimals INTEGER, factory_address TEXT, token0_address TEXT, token0_name TEXT, token0_symbol TEXT, token0_decimals INTEGER,token1_address TEXT, token1_name TEXT, token1_symbol TEXT, token1_decimals INTEGER,current_amount TEXT, is_parsed INTEGER,is_run INTEGER, block_index INTEGER, created_at INTEGER,updated_at INTEGER)',
+            'CREATE INDEX lock_lps_chain_id_index on lock_lps(chain_id);',
+            'CREATE INDEX lock_lps_chain_index_index on lock_lps(chain_index);',
+            'CREATE INDEX lock_lps_token_address_index on lock_lps(token_address);',
+            'CREATE INDEX lock_lps_symbol_index on lock_lps(symbol);',
+            'CREATE INDEX lock_lps_decimals_index on lock_lps(decimals);',
+            'CREATE INDEX lock_lps_factory_address_index on lock_lps(factory_address);',
+            'CREATE INDEX lock_lps_token0_address_index on lock_lps(token0_address);',
+            'CREATE INDEX lock_lps_token0_symbol_index on lock_lps(token0_symbol);',
+            'CREATE INDEX lock_lps_token0_decimals_index on lock_lps(token0_decimals);',
+            'CREATE INDEX lock_lps_token1_address_index on lock_lps(token1_address);',
+            'CREATE INDEX lock_lps_token1_symbol_index on lock_lps(token1_symbol);',
+            'CREATE INDEX lock_lps_token1_decimals_index on lock_lps(token1_decimals);',
+            'CREATE INDEX lock_lps_is_parsed_index on lock_lps(is_parsed);',
+            'CREATE INDEX lock_lps_is_run_index on lock_lps(is_run);',
+            'CREATE INDEX lock_lps_block_index_index on lock_lps(block_index);',
+            'CREATE UNIQUE INDEX lock_lps_chain_id_chain_index_unique on lock_lps(chain_id,chain_index)',
+          ];
+          for (var i = 0; i < lock_lps.length; i++){
+            await db.execute(lock_lps[i]);
           }
 
           var lock_logs = [
@@ -121,7 +142,7 @@ class DbService extends GetxService {
           }
 
           var stakes = [
-            'CREATE TABLE stakes(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, staking_address TEXT, token_address TEXT, token_name TEXT, token_symbol TEXT, token_decimals INTEGER, reward_address TEXT, reward_name TEXT, reward_symbol TEXT, reward_decimals INTEGER, type INTEGER, start_time INTEGER, end_time INTEGER, lock_period INTEGER, apr INTEGER, pool_cap TEXT, is_parsed INTEGER, is_run INTEGER, created_at INTEGER,updated_at INTEGER)',
+            'CREATE TABLE stakes(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, staking_address TEXT, token_address TEXT, token_name TEXT, token_symbol TEXT, token_decimals INTEGER, reward_address TEXT, reward_name TEXT, reward_symbol TEXT, reward_decimals INTEGER, type INTEGER, start_time INTEGER, end_time INTEGER, lock_period INTEGER, apr INTEGER, pool_cap TEXT, total_reward TEXT, is_parsed INTEGER, is_run INTEGER, created_at INTEGER,updated_at INTEGER)',
             'CREATE INDEX stakes_chain_id_index on stakes(chain_id);',
             'CREATE INDEX stakes_chain_index_index on stakes(chain_index)',
             'CREATE INDEX stakes_staking_address_index on stakes(staking_address);',

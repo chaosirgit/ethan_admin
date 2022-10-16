@@ -69,7 +69,8 @@ class LockLogsExecute extends ExecuteTaskFactory {
     var totalCount = await LockLogs().count(where: "chain_id = ?",whereArgs: [task.chainId]);
     await Future.delayed(Duration(seconds: seconds));
     if (totalCount == 0){
-      return 0.0;
+      task.running = 3;
+      return 1.0;
     }
     var p = parsedCount / totalCount;
     if (p == 1.0) {

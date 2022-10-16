@@ -28,7 +28,7 @@ class LocksNormalMasterExecute implements ExecuteTaskFactory {
                 try {
                   _lock = true;
                   var lock = await Locks().first(
-                      where: "chain_id = ? and chain_index = ? and type = 1",
+                      where: "chain_id = ? and chain_index = ?",
                       whereArgs: [
                         task.chainId,
                         indexArr[i].toInt(),
@@ -38,7 +38,7 @@ class LocksNormalMasterExecute implements ExecuteTaskFactory {
                     lock['name'] = res[0];
                     lock['symbol'] = res[1];
                     lock['decimals'] = (res[2] as BigInt).toInt();
-                    lock['factory_address'] = addressArr[i][1].toString();
+                    // lock['factory_address'] = addressArr[i][1].toString();
                     lock['current_amount'] = (addressArr[i][2] as BigInt).toString();
                     if (isParsed(lock)) {
                       lock["is_parsed"] = 1;
@@ -59,8 +59,12 @@ class LocksNormalMasterExecute implements ExecuteTaskFactory {
     }
     //计算进度
     var parsedCount = await Locks().count(
-        where: "chain_id = ? and is_parsed = 1 and type = 1", whereArgs: [task.chainId]);
+        where: "chain_id = ? and is_parsed = 1", whereArgs: [task.chainId]);
     await Future.delayed(Duration(seconds: seconds));
+    if (totalCount == 0){
+      task.running = 3;
+      return 1.0;
+    }
     var p = parsedCount / totalCount;
     if (p == 1.0) {
       task.running = 3;
@@ -71,7 +75,7 @@ class LocksNormalMasterExecute implements ExecuteTaskFactory {
   @override
   Future<int> getStartIndex() async {
     // TODO: implement getStartIndex
-    return await Locks().count(where: "chain_id = ? and type = 1",whereArgs: [task.chainId]);
+    return await Locks().count(where: "chain_id = ?",whereArgs: [task.chainId]);
   }
 
   @override
@@ -101,7 +105,7 @@ class LocksNormalMasterExecute implements ExecuteTaskFactory {
 
   @override
   Future<List<BigInt>> getUnParsedChainIndexList() async {
-    var list = await Locks().get(where: "chain_id = ? and is_parsed = 0 and type = 1", whereArgs: [task.chainId], orderBy: "chain_index asc");
+    var list = await Locks().get(where: "chain_id = ? and is_parsed = 0", whereArgs: [task.chainId], orderBy: "chain_index asc");
     return list.map((e) => BigInt.parse(e['chain_index'].toString())).toList();
   }
 
@@ -113,7 +117,7 @@ class LocksNormalMasterExecute implements ExecuteTaskFactory {
     if (totalCount > 0 && (totalCount - startIndex) > 0) {
       var batch = Model.dbService.db.batch();
       for (int a = startIndex; a < totalCount; a++) {
-        batch.insert(Locks().tableName,Locks().fromMap({"chain_id":task.chainId,"chain_index":a,"type":1}).toMap());
+        batch.insert(Locks().tableName,Locks().fromMap({"chain_id":task.chainId,"chain_index":a}).toMap());
       }
       await batch.commit();
     }

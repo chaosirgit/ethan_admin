@@ -104,6 +104,14 @@ class LaunchpadMasterExecute implements ExecuteTaskFactory {
             if (!_lock) {
               try {
                 _lock = true;
+                var presaleToken = await task.web3.client.call(
+                    contract: task.externMasterContract, 
+                    function: task.externMasterContract.function('getTokenBase'),
+                    params: [res[1],[BigInt.from(0)],[BigInt.from(0)]]);
+                var payToken = await task.web3.client.call(
+                    contract: task.externMasterContract,
+                    function: task.externMasterContract.function('getTokenBase'),
+                    params: [res[2],[BigInt.from(0)],[BigInt.from(0)]]);
                 var launchpad = await Launchpads().first(
                     where: "chain_id = ? and chain_index = ?",
                     whereArgs: [
@@ -116,6 +124,12 @@ class LaunchpadMasterExecute implements ExecuteTaskFactory {
                   launchpad["pay_address"] = res[2].toString();
                   launchpad["router_address"] = res[3].toString();
                   launchpad["invite_address"] = r[0].toString();
+                  launchpad["presale_name"] = presaleToken[0];
+                  launchpad["presale_symbol"] = presaleToken[1];
+                  launchpad["presale_decimals"] = (presaleToken[2] as BigInt).toInt();
+                  launchpad["pay_name"] = payToken[0];
+                  launchpad["pay_symbol"] = payToken[1];
+                  launchpad["pay_decimals"] = (payToken[2] as BigInt).toInt();
 
                   if (isParsed(launchpad)) {
                     launchpad["is_parsed"] = 1;
@@ -232,7 +246,7 @@ class LaunchpadMasterExecute implements ExecuteTaskFactory {
                 launchpad["instagram"] = res[0][7];
                 launchpad["reddit"] = res[0][8];
                 launchpad["description"] = res[0][9];
-                launchpad["pay_symbol"] = res[0][10];
+                // launchpad["pay_symbol"] = res[0][10];
 
                 if (isParsed(launchpad)) {
                   launchpad["is_parsed"] = 1;
@@ -255,6 +269,10 @@ class LaunchpadMasterExecute implements ExecuteTaskFactory {
     var parsedCount = await Launchpads().count(
         where: "chain_id = ? and is_parsed = 1", whereArgs: [task.chainId]);
     await Future.delayed(Duration(seconds: seconds));
+    if (totalCount == 0){
+      task.running = 3;
+      return 1.0;
+    }
     var p = parsedCount / totalCount;
     if (p == 1.0) {
       task.running = 3;

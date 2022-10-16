@@ -20,6 +20,7 @@ class Stakes extends Model {
   final int lockPeriod;
   final int apr;
   final String poolCap;
+  final String totalReward;
   final int isParsed;
   final int isRun;
   int? createdAt;
@@ -44,6 +45,7 @@ class Stakes extends Model {
     this.lockPeriod = 0,
     this.apr = 0,
     this.poolCap = "0",
+    this.totalReward = "0",
     this.isParsed = 0,
     this.isRun = 0,
     createdAt,
@@ -75,6 +77,7 @@ class Stakes extends Model {
       lockPeriod: map['lock_period'] ?? 0,
       apr: map['apr'] ?? 0,
       poolCap: map['pool_cap'] ?? "0",
+      totalReward: map['total_reward'] ?? "0",
       isParsed: map['is_parsed'] ?? 0,
       isRun: map['is_run'] ?? 0,
       createdAt: map['created_at'] ?? null,
@@ -106,6 +109,7 @@ class Stakes extends Model {
       'lock_period': lockPeriod,
       'apr': apr,
       'pool_cap': poolCap,
+      'total_reward': totalReward,
       'is_parsed'  : isParsed,
       'is_run' : isRun,
       'created_at' : createdAt,

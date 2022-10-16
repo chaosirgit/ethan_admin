@@ -18,7 +18,7 @@ class StakesExecute implements ExecuteTaskFactory {
 
   // 记录是否全部同步完成
   bool isParsed(Map params) {
-    return params['start_time'] as int > 0 && params["type"] != null;
+    return params['start_time'] as int > 0 && params["type"] != null && params['total_reward'] != "0";
   }
 
   // 获取链上记录总数
@@ -164,13 +164,47 @@ class StakesExecute implements ExecuteTaskFactory {
             }
           }
         });
+        //总奖励
+        task.web3.client.call(
+            contract: stakingContract,
+            function: stakingContract.function('totalRewardRequire'),
+            params: []).then((res) async {
+          if (!_lock) {
+            try {
+              _lock = true;
+              var staking = await Stakes().first(
+                  where: "chain_id = ? and chain_index = ?",
+                  whereArgs: [
+                    task.chainId,
+                    indexArr[i].toInt(),
+                  ]);
+              if (staking["is_parsed"] != 1) {
+                staking["total_reward"] = (res[0] as BigInt).toString();
+                if (isParsed(staking)) {
+                  staking["is_parsed"] = 1;
+                }
+                if (staking["id"] as int > 0) {
+                  var a = await Stakes().fromMap(staking);
+                  await a.save();
+                }
+              }
+            } catch (e) {
+              print(e);
+            } finally {
+              _lock = false;
+            }
+          }
+        });
       }
     }
     //计算进度
     var parsedCount = await Stakes().count(
         where: "chain_id = ? and is_parsed = 1", whereArgs: [task.chainId]);
     await Future.delayed(Duration(seconds: seconds));
-
+    if (totalCount == 0){
+      task.running = 3;
+      return 1.0;
+    }
     var p = parsedCount / totalCount;
     if (p == 1.0) {
       task.running = 3;

@@ -16,9 +16,10 @@ class PullChainDataController extends GetxController {
   bool check = false;
 
   Future<void> init() async {
-    if (tasks.value.isEmpty) {
+    tasks.value = <Task>[];
       for (var i = 0; i < web3.chains.length; i++) {
         if (web3.chains[i].saleMaster != "") {
+          try {
             tasks.add(await Task.generateTask(web3.chains[i], "TokenMaster"));
             tasks.add(await Task.generateTask(web3.chains[i], "LaunchpadMaster"));
             tasks.add(await Task.generateTask(web3.chains[i], "LaunchpadLogs"));
@@ -31,9 +32,22 @@ class PullChainDataController extends GetxController {
             tasks.add(await Task.generateTask(web3.chains[i], "AirdropLogsTop"));
             tasks.add(await Task.generateTask(web3.chains[i], "AirdropLogsRandom"));
             syncChainData();
+          } on SocketException catch (e) {
+            print("连接断开: " + web3.chains[i].chainId.toString());
+            Get.snackbar("Error", "RPC 连接丢失 3 秒后尝试重连");
+            await Future.delayed(Duration(seconds: 3));
+            web3.chains[i].resetClient();
+            init();
+            continue;
+          } on TaskException catch (e) {
+            Get.snackbar("Error", "$e");
+            continue;
+          } catch (e) {
+            print(e);
+            continue;
+          }
         }
       }
-    }
   }
 
   Future<void> stop() async {
@@ -72,7 +86,7 @@ class PullChainDataController extends GetxController {
           Get.snackbar("Error", "$e");
           break;
         } catch (e) {
-          print("$e");
+          print("fff $e");
           break;
         }
       }
@@ -121,6 +135,18 @@ class PullChainData extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              pcdc.init();
+                            },
+                            style: ButtonStyle(
+                                backgroundColor:
+                                MaterialStatePropertyAll<Color>(
+                                    Colors.blueAccent)),
+                            child: Icon(Icons.sync)),
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
