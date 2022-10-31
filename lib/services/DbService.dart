@@ -142,9 +142,10 @@ class DbService extends GetxService {
           }
 
           var stakes = [
-            'CREATE TABLE stakes(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, staking_address TEXT, token_address TEXT, token_name TEXT, token_symbol TEXT, token_decimals INTEGER, reward_address TEXT, reward_name TEXT, reward_symbol TEXT, reward_decimals INTEGER, type INTEGER, start_time INTEGER, end_time INTEGER, lock_period INTEGER, apr INTEGER, pool_cap TEXT, total_reward TEXT, is_parsed INTEGER, is_run INTEGER, created_at INTEGER,updated_at INTEGER)',
+            'CREATE TABLE stakes(id INTEGER PRIMARY KEY AUTOINCREMENT, chain_id INTEGER,chain_index INTEGER, owner TEXT,staking_address TEXT, token_address TEXT, token_name TEXT, token_symbol TEXT, token_decimals INTEGER, reward_address TEXT, reward_name TEXT, reward_symbol TEXT, reward_decimals INTEGER, type INTEGER, start_time INTEGER, end_time INTEGER, lock_period INTEGER, apr INTEGER, pool_cap TEXT, current_amount TEXT,total_reward TEXT, logo TEXT,is_parsed INTEGER, is_run INTEGER, created_at INTEGER,updated_at INTEGER)',
             'CREATE INDEX stakes_chain_id_index on stakes(chain_id);',
             'CREATE INDEX stakes_chain_index_index on stakes(chain_index)',
+            'CREATE INDEX stakes_owner_index on stakes(owner)',
             'CREATE INDEX stakes_staking_address_index on stakes(staking_address);',
             'CREATE INDEX stakes_token_address_index on stakes(token_address);',
             'CREATE INDEX stakes_reward_address_index on stakes(reward_address);',

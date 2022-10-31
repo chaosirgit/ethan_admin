@@ -74,7 +74,54 @@ class StakesExecute implements ExecuteTaskFactory {
       for (var i = 0; i < addressArr.length; i++) {
         var stakingContract = await getContract(
             'Staking.abi', addressArr[i].toString());
+        // 类型
+        // task.web3.client.call(
+        //     contract: task.externMasterContract,
+        //     function: task.externMasterContract.function('tokenOfParams256'),
+        //     params: [addressArr[i],[BigInt.from(0)]]).then((res) async {
+        //   if (!_lock) {
+        //     try {
+        //       _lock = true;
+        //       var staking = await Stakes().first(
+        //           where: "chain_id = ? and chain_index = ?",
+        //           whereArgs: [
+        //             task.chainId,
+        //             indexArr[i].toInt(),
+        //           ]);
+        //       if (staking["is_parsed"] != 1) {
+        //         staking["type"] = (res[0][0] as BigInt).toInt();
+        //         if (isParsed(staking)) {
+        //           staking["is_parsed"] = 1;
+        //         }
+        //         if (staking["id"] as int > 0) {
+        //           var a = await Stakes().fromMap(staking);
+        //           await a.save();
+        //         }
+        //       }
+        //     } catch (e) {
+        //       print(e);
+        //     } finally {
+        //       _lock = false;
+        //     }
+        //   }
+        // });
         //基础信息
+        // current_amount
+        var ownerChain = await task.web3.client.call(
+          contract: stakingContract,
+          function: stakingContract.function('owner'),
+          params: []); //Address
+        var typeChain = await task.web3.client.call(
+            contract: task.externMasterContract,
+            function: task.externMasterContract.function('tokenOfParams256'),
+            params: [addressArr[i],[BigInt.from(0)]]
+        );
+        var type = (typeChain[0][0] as BigInt).toInt();
+        var currentAmountChain = await task.web3.client.call(
+            contract: stakingContract,
+            function: stakingContract.function('stakingTotal'),
+            params: []
+        ); //big int
         task.web3.client.call(
             contract: stakingContract,
             function: stakingContract.function('getConfig'),
@@ -94,6 +141,7 @@ class StakesExecute implements ExecuteTaskFactory {
                           ]);
                       if (staking["is_parsed"] != 1) {
                         staking["start_time"] = (res[0] as BigInt).toInt();
+                        staking["owner"] = (ownerChain[0] as EthereumAddress).toString();
                         staking["end_time"] = (res[1] as BigInt).toInt();
                         staking["lock_period"] = (res[2] as BigInt).toInt();
                         staking["staking_address"] = addressArr[i].toString();
@@ -102,6 +150,7 @@ class StakesExecute implements ExecuteTaskFactory {
                         staking["token_symbol"] = r[1];
                         staking["token_decimals"] = (r[2] as BigInt).toInt();
                         staking["reward_address"] = res[4].toString();
+                        staking["current_amount"] = (currentAmountChain[0] as BigInt).toString();
                         if (res[3] == res[4]){
                           staking["reward_name"] = r[0];
                           staking["reward_symbol"] = r[1];
@@ -115,7 +164,22 @@ class StakesExecute implements ExecuteTaskFactory {
                           staking["reward_symbol"] = reward[1];
                           staking["reward_decimals"] = (reward[2] as BigInt).toInt();
                         }
-                        staking["apr"] = (res[5] as BigInt).toInt();
+                        staking["type"] = type;
+                        if (type == 1) {
+                          if ((currentAmountChain[0] as BigInt).toString() == "0"){
+                            staking["apr"] = 0;
+                          }else{
+                            var st;
+                            if (task.chainId == 1) {
+                              st = BigInt.from(12);
+                            }else{
+                              st = BigInt.from(3);
+                            }
+                            staking["apr"] = ((BigInt.from(365 * 24 * 60 * 60) * res[5]) / (st * currentAmountChain[0])).toInt();
+                          }
+                        }else{
+                          staking["apr"] = (res[5] as BigInt).toInt();
+                        }
                         staking["pool_cap"] = (res[6] as BigInt).toString();
                         if (isParsed(staking)) {
                           staking["is_parsed"] = 1;
@@ -127,43 +191,14 @@ class StakesExecute implements ExecuteTaskFactory {
                       }
                     } catch (e) {
                       print(e);
+                      throw e;
                     } finally {
                       _lock = false;
                     }
                   }
                 });
         });
-        // 类型
-        task.web3.client.call(
-            contract: task.externMasterContract,
-            function: task.externMasterContract.function('tokenOfParams256'),
-            params: [addressArr[i],[BigInt.from(0)]]).then((res) async {
-          if (!_lock) {
-            try {
-              _lock = true;
-              var staking = await Stakes().first(
-                  where: "chain_id = ? and chain_index = ?",
-                  whereArgs: [
-                    task.chainId,
-                    indexArr[i].toInt(),
-                  ]);
-              if (staking["is_parsed"] != 1) {
-                staking["type"] = (res[0][0] as BigInt).toInt();
-                if (isParsed(staking)) {
-                  staking["is_parsed"] = 1;
-                }
-                if (staking["id"] as int > 0) {
-                  var a = await Stakes().fromMap(staking);
-                  await a.save();
-                }
-              }
-            } catch (e) {
-              print(e);
-            } finally {
-              _lock = false;
-            }
-          }
-        });
+
         //总奖励
         task.web3.client.call(
             contract: stakingContract,

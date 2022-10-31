@@ -5,6 +5,7 @@ class Stakes extends Model {
   final int? id;
   final int chainId;
   final int chainIndex;
+  final String owner;
   final String stakingAddress;
   final String tokenAddress;
   final String tokenName;
@@ -20,6 +21,7 @@ class Stakes extends Model {
   final int lockPeriod;
   final int apr;
   final String poolCap;
+  final String currentAmount;
   final String totalReward;
   final int isParsed;
   final int isRun;
@@ -30,6 +32,7 @@ class Stakes extends Model {
     this.id = null,
     this.chainId = 0,
     this.chainIndex = 0,
+    this.owner = "",
     this.stakingAddress = "",
     this.tokenAddress = "",
     this.tokenSymbol = "",
@@ -45,6 +48,7 @@ class Stakes extends Model {
     this.lockPeriod = 0,
     this.apr = 0,
     this.poolCap = "0",
+    this.currentAmount = "0",
     this.totalReward = "0",
     this.isParsed = 0,
     this.isRun = 0,
@@ -62,6 +66,7 @@ class Stakes extends Model {
       id: map['id'] ?? null,
       chainId: map['chain_id'] ?? 0,
       chainIndex: map['chain_index'] ?? 0,
+      owner: map['owner'] ?? "",
       stakingAddress: map['staking_address'] ?? "",
       tokenAddress: map['token_address'] ?? "",
       tokenName: map['token_name'] ?? "",
@@ -77,6 +82,7 @@ class Stakes extends Model {
       lockPeriod: map['lock_period'] ?? 0,
       apr: map['apr'] ?? 0,
       poolCap: map['pool_cap'] ?? "0",
+      currentAmount: map['current_amount'] ?? "0",
       totalReward: map['total_reward'] ?? "0",
       isParsed: map['is_parsed'] ?? 0,
       isRun: map['is_run'] ?? 0,
@@ -94,6 +100,7 @@ class Stakes extends Model {
     Map<String, Object?> map = {
       'chain_id' : chainId,
       'chain_index' : chainIndex,
+      'owner' : owner,
       'staking_address' : stakingAddress,
       'token_address' : tokenAddress,
       'token_name' : tokenName,
@@ -109,6 +116,7 @@ class Stakes extends Model {
       'lock_period': lockPeriod,
       'apr': apr,
       'pool_cap': poolCap,
+      "current_amount" : currentAmount,
       'total_reward': totalReward,
       'is_parsed'  : isParsed,
       'is_run' : isRun,
