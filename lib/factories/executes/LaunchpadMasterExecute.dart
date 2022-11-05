@@ -1,4 +1,5 @@
 import 'package:ethan_admin/factories/ExecuteTaskFactory.dart';
+import 'package:ethan_admin/helpers/helper.dart';
 import 'package:ethan_admin/helpers/task.dart';
 import 'package:ethan_admin/models/Launchpads.dart';
 import 'package:ethan_admin/models/Model.dart';
@@ -89,11 +90,14 @@ class LaunchpadMasterExecute implements ExecuteTaskFactory {
             }
           }
         });
+        var launchpadContract = await getContract('Launchpad.abi', addressArr[i].toString());
+        var helperAddress = await task.web3.client.call(contract: launchpadContract, function: launchpadContract.function('creator'), params: []);
+        var helperContract = await getContract('HelperMaster.abi', helperAddress[1].toString());
 
         //基础信息 + invite_address
         task.web3.client.call(
-            contract: task.helperMasterContract!,
-            function: task.helperMasterContract!.function('getBase'),
+            contract: helperContract,
+            function: helperContract.function('getBase'),
             params: [addressArr[i]]).then((res) async {
           task.web3.client.call(
               contract: task.referralMasterContract,
@@ -150,8 +154,8 @@ class LaunchpadMasterExecute implements ExecuteTaskFactory {
 
         //基础参数
         task.web3.client.call(
-            contract: task.helperMasterContract!,
-            function: task.helperMasterContract!.function('getParams'),
+            contract: helperContract,
+            function: helperContract.function('getParams'),
             params: [
               addressArr[i],
             ]).then((res) async {

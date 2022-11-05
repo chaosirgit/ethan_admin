@@ -25,7 +25,6 @@ class Task {
   DeployedContract referralMasterContract;
   DeployedContract? tokenMasterContract;
   DeployedContract? launchpadMasterContract;
-  DeployedContract? helperMasterContract;
   DeployedContract? lockMasterContract;
   DeployedContract? stakingMasterContract;
   ChainOrigin web3;
@@ -43,14 +42,13 @@ class Task {
       required this.referralMasterContract,
       this.tokenMasterContract,
       this.launchpadMasterContract,
-      this.helperMasterContract,
       this.lockMasterContract,
       this.stakingMasterContract,
       required this.web3,
       this.running = 1});
 
   String toString() {
-    return "Task: {name: $name,contractName: $contractName,progress: $progress,address: $address,chainName: $chainName,chainId: $chainId,externMasterContract: $externMasterContract, referralMasterContract: $referralMasterContract,tokenMasterContract: $tokenMasterContract,launchpadMasterContract: $launchpadMasterContract,helperMasterContract: $helperMasterContract,lockMasterContract: $lockMasterContract, stakingMasterContract: $stakingMasterContract, running: $running,web3: $web3}";
+    return "Task: {name: $name,contractName: $contractName,progress: $progress,address: $address,chainName: $chainName,chainId: $chainId,externMasterContract: $externMasterContract, referralMasterContract: $referralMasterContract,tokenMasterContract: $tokenMasterContract,launchpadMasterContract: $launchpadMasterContract,lockMasterContract: $lockMasterContract, stakingMasterContract: $stakingMasterContract, running: $running,web3: $web3}";
   }
 
   static Future<Task> generateTask(ChainOrigin co, String contractName) async {
@@ -86,7 +84,6 @@ class Task {
     var name = "";
     var tokenMasterContract = null;
     var launchpadMasterContract = null;
-    var helperMasterContract = null;
     var lockMasterContract = null;
     var stakingMasterContract = null;
     var contractAddress = "";
@@ -116,35 +113,9 @@ class Task {
         contractAddress = launchpadMasterAddress[0].toString();
         launchpadMasterContract =
             await getContract('LaunchpadMaster.abi', contractAddress);
-        // 获取Helper合约
-        var helperMasterAddress = await co.client.call(
-          contract: saleMasterContract,
-          function: saleMasterContract.function('addressOf'),
-          params: [
-            BigInt.from(1001),
-          ],
-        );
-        if (helperMasterAddress.isEmpty) {
-          throw TaskException("未设置 Helper 合约");
-        }
-        helperMasterContract = await getContract(
-            'HelperMaster.abi', helperMasterAddress[0].toString());
         break;
       case "LaunchpadLogs":
         name = "Launchpad 参与记录列表";
-        // 获取Helper合约
-        var helperMasterAddress = await co.client.call(
-          contract: saleMasterContract,
-          function: saleMasterContract.function('addressOf'),
-          params: [
-            BigInt.from(1001),
-          ],
-        );
-        if (helperMasterAddress.isEmpty) {
-          throw TaskException("未设置 Helper 合约");
-        }
-        helperMasterContract = await getContract(
-            'HelperMaster.abi', helperMasterAddress[0].toString());
         break;
       case "LockNormalMaster":
         name = "Lock 仓库列表(普通)";
@@ -226,7 +197,6 @@ class Task {
         referralMasterContract: referralMasterContract,
         tokenMasterContract: tokenMasterContract,
         launchpadMasterContract: launchpadMasterContract,
-        helperMasterContract: helperMasterContract,
         lockMasterContract: lockMasterContract,
         stakingMasterContract: stakingMasterContract,
         web3: co);

@@ -1,9 +1,11 @@
 import 'package:ethan_admin/factories/ExecuteTaskFactory.dart';
+import 'package:ethan_admin/helpers/helper.dart';
 import 'package:ethan_admin/models/LaunchpadLogs.dart';
 import 'package:ethan_admin/models/Launchpads.dart';
 import 'package:ethan_admin/models/Model.dart';
 import 'package:ethan_admin/helpers/task.dart';
 import 'package:web3dart/credentials.dart';
+import 'package:web3dart/web3dart.dart';
 
 
 class LaunchpadLogsExecute extends ExecuteTaskFactory {
@@ -17,14 +19,17 @@ class LaunchpadLogsExecute extends ExecuteTaskFactory {
     var launchpads = await Launchpads().get(where: "is_parsed = 1 and chain_id = ?",whereArgs: [task.chainId]);
     for (var i = 0; i < launchpads.length; i++) {
       var launchpadAddress = launchpads[i]['contract_address'] as String;
-      var totalCount = await getTotalCountByAddress(launchpadAddress);
+      var launchpadContract = await getContract('Launchpad.abi', launchpadAddress);
+      var helperAddress = await task.web3.client.call(contract: launchpadContract, function: launchpadContract.function('creator'), params: []);
+      var helperContract = await getContract('HelperMaster.abi', helperAddress[1].toString());
+      var totalCount = await getTotalCountByAddress(launchpadAddress,helperContract);
       var startIndex = await getStartIndexByAddress(launchpadAddress);
       await insertNewToDatabaseByAddress(totalCount, startIndex, launchpadAddress);
       var indexArr = await getUnParsedChainIndexListByAddress(launchpadAddress);
       if (indexArr.isNotEmpty) {
         task.web3.client.call(
-          contract: task.helperMasterContract!,
-          function: task.helperMasterContract!.function('SaleList'),
+          contract: helperContract,
+          function: helperContract.function('SaleList'),
           params: [EthereumAddress.fromHex(launchpadAddress),indexArr[0],BigInt.from(totalCount)]
         ).then((res) async {
           if (!_lock) {
@@ -77,10 +82,10 @@ class LaunchpadLogsExecute extends ExecuteTaskFactory {
     return await LaunchpadLogs().count(where: "chain_id = ? and launchpad_address = ?",whereArgs: [task.chainId, tokenAddress]);
   }
 
-  Future<int> getTotalCountByAddress(String tokenAddress) async {
+  Future<int> getTotalCountByAddress(String tokenAddress,DeployedContract helperContract) async {
     var total = await task.web3.client.call(
-      contract: task.helperMasterContract!,
-      function: task.helperMasterContract!.function('SaleList'), params: [EthereumAddress.fromHex(tokenAddress),BigInt.from(0), BigInt.from(1)]
+      contract: helperContract,
+      function: helperContract.function('SaleList'), params: [EthereumAddress.fromHex(tokenAddress),BigInt.from(0), BigInt.from(1)]
     );
     return (total[0] as BigInt).toInt();
   }
