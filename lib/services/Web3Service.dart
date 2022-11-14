@@ -38,15 +38,20 @@ final List<ChainOrigin> CHAIN_ORIGIN = <ChainOrigin>[
   ChainOrigin.create(
     chainId: 1,
     rpc: "https://cloudflare-eth.com",
-    saleMaster: "",
+    saleMaster: ETH_SALE_MASTER_ADDRESS,
   ),
   ChainOrigin.create(
-      chainId: 56, rpc: "https://bsc-dataseed1.binance.org", saleMaster: ""),
+      chainId: 56, rpc: "https://bsc-dataseed1.binance.org", saleMaster: BNB_SALE_MASTER_ADDRESS),
   ChainOrigin.create(
       chainId: 97,
       rpc: "https://data-seed-prebsc-1-s1.binance.org:8545",
       // rpc: "https://data-seed-prebsc-1-s2.binance.org:8545",
       saleMaster: BNB_TEST_SALE_MASTER_ADDRESS),
+  ChainOrigin.create(
+    chainId: 5,
+    rpc: "https://rpc.ankr.com/eth_goerli",
+    saleMaster: ETH_TEST_SALE_MASTER_ADDRESS,
+  )
 ];
 
 class Web3Service extends GetxService {
@@ -63,6 +68,8 @@ class Web3Service extends GetxService {
         serverName = "币安链 Web3 通信";
       } else if (co.chainId == 97) {
         serverName = "币安测试 Web3 通信";
+      } else if (co.chainId == 5) {
+        serverName = "以太测试 Web3 通信";
       }
       try {
         ic.changeMessages(ServiceStatus(name: serverName, successful: 3));

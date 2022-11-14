@@ -59,6 +59,8 @@ class Task {
       chainName = "币安链";
     } else if (co.chainId == 97) {
       chainName = "币安测试链";
+    } else if (co.chainId == 5) {
+      chainName = "以太测试链";
     } else {
       throw TaskException("不支持的链ID");
     }

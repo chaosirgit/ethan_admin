@@ -12,6 +12,12 @@ class LockLpsController extends GetxController {
         var d = Map.of(e);
         if (d['chain_id'] == 97){
           d['chain_name'] = "币安测试链";
+        }else if (d['chain_id'] == 56) {
+          d['chain_name'] = "币安链";
+        }else if (d['chain_id'] == 1) {
+          d['chain_name'] = "以太链";
+        }else if (d['chain_id'] == 5) {
+          d['chain_name'] = "以太测试链";
         }
         d['pair_name'] = d['token0_symbol'] + '/' + d['token1_symbol'];
         return d;
